@@ -15,21 +15,6 @@ struct TemplateActividad2: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Back button
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "arrow.left")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 25)
-                        .foregroundColor(.black)
-                        .padding(10)
-                        .background(Color(white: 1))
-                        .clipShape(Circle())
-                }
-                .offset(x: -UIScreen.main.bounds.width / 2 + 35, y: -UIScreen.screenHeight / 2 + 60)
-                .zIndex(2)
                 
                 // Background gradient
                 GeometryReader { geometry in
@@ -58,41 +43,62 @@ struct TemplateActividad2: View {
                 
                 // Main content
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        // Header
-                        Text(unaActividad.nombre)
-                            .padding()
-                            .bold()
-                            .font(.largeTitle)
-                            .foregroundColor(colores[unaActividad.idZona]!)
+                    // Back button
+                    ZStack(alignment: .top){
                         
-                        // Complete button
                         Button(action: {
-                            ActividadUsuario.crearActividadUsuario(idUsuario: usuarioGlobal!.idUsuario, idActividad: unaActividad.idActividad) { success in
-                                if success {
-                                    print("Actividad creada exitosamente.")
-                                    actividadesCompletadas[unaActividad.idActividad] = true
-                                    isActivityCompleted = true
-                                } else {
-                                    print("Error al crear la actividad.")
-                                }
-                            }
+                            dismiss()
                         }) {
-                            Text(actividadesCompletadas[unaActividad.idActividad] ? "Completada" : "Completar")
-                                .foregroundColor(actividadesCompletadas[unaActividad.idActividad] ? .red : .green)
-                                .padding(5)
-                                .background(Color.white)
-                                .cornerRadius(5)
+                            Image(systemName: "arrow.left")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 25)
+                                .foregroundColor(.white)
+                                .bold()
+                                .padding(10)
+                                .background(Color(white: 0.15))
+                                .clipShape(Circle())
                         }
-                        .disabled(isActivityCompleted)
+                        .zIndex(2)
                         
-                        // Cards
-                        ForEach(unaActividad.listaTarjetas, id: \.idTarjeta) { tarjeta in
-                            tarjetaView(tarjeta: tarjeta, actividad: unaActividad)
+                        
+                        VStack(spacing: 20) {
+                            // Header
+                            Text(unaActividad.nombre)
+                                .padding()
+                                .bold()
+                                .font(.largeTitle)
+                                .foregroundColor(colores[unaActividad.idZona]!)
+                            
+                            // Complete button
+                            Button(action: {
+                                ActividadUsuario.crearActividadUsuario(idUsuario: usuarioGlobal!.idUsuario, idActividad: unaActividad.idActividad) { success in
+                                    if success {
+                                        print("Actividad creada exitosamente.")
+                                        actividadesCompletadas[unaActividad.idActividad] = true
+                                        isActivityCompleted = true
+                                    } else {
+                                        print("Error al crear la actividad.")
+                                    }
+                                }
+                            }) {
+                                Text(actividadesCompletadas[unaActividad.idActividad] ? "Completada" : "Completar")
+                                    .foregroundColor(actividadesCompletadas[unaActividad.idActividad] ? .red : .green)
+                                    .padding(5)
+                                    .background(Color.white)
+                                    .cornerRadius(5)
+                            }
+                            .disabled(isActivityCompleted)
+                            
+                            // Cards
+                            ForEach(unaActividad.listaTarjetas, id: \.idTarjeta) { tarjeta in
+                                tarjetaView(tarjeta: tarjeta, actividad: unaActividad)
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.bottom, 50)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 50)
+                    
                 }
             }
             .onAppear {

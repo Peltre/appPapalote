@@ -18,6 +18,7 @@
 		433861012CBF631A00EAC170 /* Piso1.svg in Resources */ = {isa = PBXBuildFile; fileRef = 433860FF2CBF631A00EAC170 /* Piso1.svg */; };
 		433861022CBF631A00EAC170 /* Piso2.svg in Resources */ = {isa = PBXBuildFile; fileRef = 433861002CBF631A00EAC170 /* Piso2.svg */; };
 		9407AE862CD01C7500036567 /* ZoneManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9407AE852CD01C7500036567 /* ZoneManager.swift */; };
+		941533602CE3F14900EA3D44 /* PruebaScrollExhibiciones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9415335F2CE3F14900EA3D44 /* PruebaScrollExhibiciones.swift */; };
 		943181262CC82FD4004DD50E /* MapaDetalladoZona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943181252CC82FD4004DD50E /* MapaDetalladoZona.swift */; };
 		94529DE02CC9D3E90072FA5B /* RojoDetallado.svg in Resources */ = {isa = PBXBuildFile; fileRef = 94529DDF2CC9D3E90072FA5B /* RojoDetallado.svg */; };
 		94529DEE2CCA09940072FA5B /* AzulDetallado.svg in Resources */ = {isa = PBXBuildFile; fileRef = 94529DE92CCA09940072FA5B /* AzulDetallado.svg */; };
@@ -50,6 +51,7 @@
 		433860FF2CBF631A00EAC170 /* Piso1.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Piso1.svg; sourceTree = "<group>"; };
 		433861002CBF631A00EAC170 /* Piso2.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Piso2.svg; sourceTree = "<group>"; };
 		9407AE852CD01C7500036567 /* ZoneManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneManager.swift; sourceTree = "<group>"; };
+		9415335F2CE3F14900EA3D44 /* PruebaScrollExhibiciones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PruebaScrollExhibiciones.swift; sourceTree = "<group>"; };
 		943181252CC82FD4004DD50E /* MapaDetalladoZona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapaDetalladoZona.swift; sourceTree = "<group>"; };
 		94529DDF2CC9D3E90072FA5B /* RojoDetallado.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = RojoDetallado.svg; sourceTree = "<group>"; };
 		94529DE92CCA09940072FA5B /* AzulDetallado.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = AzulDetallado.svg; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				433860EF2CBF5E3F00EAC170 /* ZonaDetallada.swift */,
 				943181252CC82FD4004DD50E /* MapaDetalladoZona.swift */,
 				94EB9A4B2CE2975000B3AE7D /* selectorFotos.swift */,
+				9415335F2CE3F14900EA3D44 /* PruebaScrollExhibiciones.swift */,
 			);
 			path = Mapa;
 			sourceTree = "<group>";
@@ -285,6 +288,7 @@
 				A47D213B2CBCB76F00BCD187 /* vistaInicio.swift in Sources */,
 				94EB9A482CE2974500B3AE7D /* vistaNoticias.swift in Sources */,
 				94EB9A442CE2973E00B3AE7D /* Perfil.swift in Sources */,
+				941533602CE3F14900EA3D44 /* PruebaScrollExhibiciones.swift in Sources */,
 				94EB9A422CE2971A00B3AE7D /* InicioOverhaul.swift in Sources */,
 				A47D21292CBB2E4E00BCD187 /* proyectoRetoApp.swift in Sources */,
 			);
