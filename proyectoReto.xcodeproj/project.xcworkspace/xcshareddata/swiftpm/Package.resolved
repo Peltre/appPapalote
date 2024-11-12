@@ -1,0 +1,15 @@
+{
+  "originHash" : "0ad2c64dd751d79fb407647501d4a260e86be058b415ae6689621f38d171966f",
+  "pins" : [
+    {
+      "identity" : "interactivemap",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GrandSir/InteractiveMap",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4fc6f5f736c9cbf2352938a6b27712937a5d6465"
+      }
+    }
+  ],
+  "version" : 3
+}
