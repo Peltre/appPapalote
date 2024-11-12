@@ -6,9 +6,25 @@
 //
 
 import SwiftUI
+import CodeScanner
 
 struct InicioOverhaul: View {
     @State var selectedIndex = 0
+    
+    @State var isPresentingScanner = false
+    @State var scannedCode: String = "Scan a QR"
+
+    var scannerSheet : some View {
+        CodeScannerView(
+            codeTypes: [.qr],
+            completion: { result in
+                if case let .success(code) = result {
+                    self.scannedCode = code.string
+                    self.isPresentingScanner = false
+                }
+            }
+        )
+    }
     
     var colorVerde = Color(red: 190 / 255.0, green: 214 / 255.0, blue: 0 / 255.0)
 
@@ -62,7 +78,7 @@ struct InicioOverhaul: View {
                 ForEach(0..<5, id:\.self ) { number in
                     Spacer()
                     Button(action: {
-                        
+                        self.isPresentingScanner = true
                     }, label: {
                         if (icons[number] == "plus.app.fill") {
                           Image(systemName: icons[number])
@@ -79,6 +95,9 @@ struct InicioOverhaul: View {
                         }
                     })
                     Spacer()
+                        .sheet(isPresented: $isPresentingScanner){
+                            self.scannerSheet
+                        }
                 }
             }
             
