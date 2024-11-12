@@ -18,99 +18,93 @@ struct ZonaDetallada: View, Identifiable {
     
     var body: some View {
         NavigationStack {
-            ZStack{
+            ZStack {
                 colores[idZona]!
                     .ignoresSafeArea()
-                ScrollViewReader { proxy in
-                    VStack {
-                        // Botón de retroceso y título
-                        ZStack {
-                            Button(action: {
-                                dismiss()
-                            }) {
-                                Image(systemName: "arrow.left")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 25)
-                                    .foregroundColor(.black)
-                                    .padding(10)
-                                    .background(Color(white: 1))
-                                    .clipShape(Circle())
-                            }
-                            .offset(x: -UIScreen.main.bounds.width/2 + 35)
-                            Text(pathDictionary[TituloZona]?.1 ?? "Rara")
-                                .font(.system(size: 35))
-                                .bold()
+                
+                VStack {
+                    // Botón de retroceso y título
+                    ZStack {
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Image(systemName: "arrow.left")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 25)
+                                .foregroundColor(.black)
+                                .padding(10)
+                                .background(Color(white: 1))
+                                .clipShape(Circle())
                         }
+                        .offset(x: -UIScreen.screenWidth / 2 + 35)
                         
-                        // Lista de actividades con fondo de color
-                        ZStack {
-                            (pathDictionary[TituloZona]?.0 ?? Color(white: 0.75))
-                                .edgesIgnoringSafeArea(.all)
-                            
-                            List(actividadModel.actividadesFiltradas) { actividad in
-                                NavigationLink(destination: TemplateActividad2(unaActividad: actividad)
-                                    .onDisappear {
-                                        enfocarActividadNombre = nil // Restablece a nil cuando se regresa de TemplateActividad2
-                                    }
-                                ) {
-                                    CeldaJugador(
-                                        unaActividad: actividad,
-                                        idZona: idZona,
-                                        isHighlighted: actividad.nombre.removeAccents() == enfocarActividadNombre
-                                    )
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal)
-                                }
-                                .id(actividad.idActividad) // Asigna el ID de cada celda
-                                .listRowBackground(Color.clear)
-                                .listRowSeparator(.hidden)
-                            }
-                            .listStyle(PlainListStyle())
-                            .offset(x: 9)
-                            
-                        }
-                        .shadow(radius: 5)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        
-                        Spacer()
-                        
-                        // Footer con botón "Ir a la vista de mapa"
-                        NavigationLink(destination: MapaDetalladoZona(onSelectPath:  { selectedNombre in
-                            enfocarActividadNombre = selectedNombre.capitalized
-                        }, idZona: idZona)) {
-                            Text("Ir a la vista de mapa")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 220)
-                                .background(colores[idZona] ?? Color.gray)
-                                .cornerRadius(10)
-                                .shadow(radius: 4)
-                        }
-                        .padding(.top,15)
-                        
+                        Text(pathDictionary[TituloZona]?.1 ?? "Rara")
+                            .font(.system(size: 35))
+                            .bold()
                     }
-                    .navigationBarBackButtonHidden(true)
-                    .onAppear {
-                        if let nombre = enfocarActividadNombre?.removeAccents() {
-                            actividadModel.actividadesFiltradas.forEach { actividad in
-                                print("Comparing: \(nombre) - \(actividad.nombre.removeAccents())")
-                            }
-                            
-                            if let actividad = actividadModel.actividadesFiltradas.first(where: { $0.nombre.removeAccents().caseInsensitiveCompare(nombre) == .orderedSame }) {
-                                // Desplaza al elemento con el ID correspondiente al nombre
-                                proxy.scrollTo(actividad.idActividad, anchor: .center)
-                            }
-                        }
-                    }
-                    .background(.thinMaterial.opacity(0.8))
                     
+                    // Scrollable card stack for actividades using CacheAsyncImage
+                    // Scrollable card stack for actividades
+                    ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
+                        NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
+                            ZStack {
+                                // Find tarjeta with orden_lista == 1
+                                if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
+                                    AsyncImage(url: URL(string: backgroundImageUrl)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    } placeholder: {
+                                        Color.gray.opacity(0.3) // Placeholder while loading
+                                    }
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(.black.opacity(0.4)) // Apply ultra-thin material overlay for more diffused look
+                                    )
+                                }
+
+                                VStack {
+                                    Text("\(actividad.idActividad)")
+                                        .font(.largeTitle)
+                                        .bold()
+                                        .foregroundColor(.white)
+                                    Text(actividad.nombre)
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .frame(width: UIScreen.screenWidth-60, height: UIScreen.screenHeight/1.7) // Set size to match demo card height
+                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                        }
+                    }
+                    .padding(.top, 90)
+                    
+                    Spacer()
+                    
+                    // Footer con botón "Ir a la vista de mapa"
+                    NavigationLink(destination: MapaDetalladoZona(onSelectPath:  { selectedNombre in
+                        enfocarActividadNombre = selectedNombre.capitalized
+                    }, idZona: idZona)) {
+                        Text("Ir a la vista de mapa")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: 220)
+                            .background(colores[idZona] ?? Color.gray)
+                            .cornerRadius(10)
+                            .shadow(radius: 4)
+                    }
+                    .padding(.top, 15)
                 }
+                .navigationBarBackButtonHidden(true)
+                .background(.thinMaterial.opacity(0.8))
             }
         }
     }
 }
+
 
 
 struct CeldaJugador: View {
