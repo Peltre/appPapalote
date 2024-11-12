@@ -37,6 +37,7 @@
 		A47D21302CBB2E5000BCD187 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A47D212F2CBB2E5000BCD187 /* Preview Assets.xcassets */; };
 		A47D213B2CBCB76F00BCD187 /* vistaInicio.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47D213A2CBCB76F00BCD187 /* vistaInicio.swift */; };
 		A47D213D2CBCB8B700BCD187 /* appState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47D213C2CBCB8B700BCD187 /* appState.swift */; };
+		EBA793B02CE3C27F007D9576 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = EBA793AF2CE3C27F007D9576 /* CodeScanner */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBA793B02CE3C27F007D9576 /* CodeScanner in Frameworks */,
 				433860F52CBF5FBD00EAC170 /* InteractiveMap in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -233,6 +235,7 @@
 			mainGroup = A47D211C2CBB2E4E00BCD187;
 			packageReferences = (
 				433860F32CBF5FBD00EAC170 /* XCRemoteSwiftPackageReference "InteractiveMap" */,
+				EBA793AE2CE3C27F007D9576 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 			);
 			productRefGroup = A47D21262CBB2E4E00BCD187 /* Products */;
 			projectDirPath = "";
@@ -417,8 +420,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"proyectoReto/Preview Content\"";
+				DEVELOPMENT_TEAM = PTMVRUL882;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Read QR Code";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -445,8 +450,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"proyectoReto/Preview Content\"";
+				DEVELOPMENT_TEAM = PTMVRUL882;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Read QR Code";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -497,6 +504,14 @@
 				kind = branch;
 			};
 		};
+		EBA793AE2CE3C27F007D9576 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -504,6 +519,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 433860F32CBF5FBD00EAC170 /* XCRemoteSwiftPackageReference "InteractiveMap" */;
 			productName = InteractiveMap;
+		};
+		EBA793AF2CE3C27F007D9576 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBA793AE2CE3C27F007D9576 /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
