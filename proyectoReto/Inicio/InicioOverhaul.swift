@@ -14,10 +14,14 @@ struct InicioOverhaul: View {
     @State var isPresentingScanner = false
     @State var scannedCode: String = "Scan a QR"
     @State var navegarActividad: Bool = false
-    @State var activityId: Int?
-    
-    var unaActividad: Actividad2
+    @State var actividadEncontrada: Actividad2? = nil // Guardar la actividad escaneada
 
+    @StateObject private var actividadModel: ActividadesViewModel
+    
+    // Inicialización del ViewModel
+    init(idZona: Int) {
+        _actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
+    }
 
     var scannerSheet: some View {
         CodeScannerView(
@@ -103,7 +107,7 @@ struct InicioOverhaul: View {
         }
         .background(
             NavigationLink(
-                destination: TemplateActividad2(unaActividad: Actividad2(idActividad: activityId ?? 0, idZona: 2, nombre: "Ete Sech", listaTarjetas: Tarjeta.datosEjemplo)),
+                destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo)),
                 isActive: $navegarActividad
             ) {
                 EmptyView()
@@ -116,13 +120,21 @@ struct InicioOverhaul: View {
         if code.starts(with: "actividad:") {
             let components = code.split(separator: ":")
             if let idString = components.last, let id = Int(idString) {
-                self.activityId = id
-                self.navegarActividad = true // Activa la navegación
+                // Intentar obtener la actividad por ID usando el ActividadesViewModel
+                if let actividad = actividadModel.obtenerActividadPorId(id) {
+                    self.actividadEncontrada = actividad
+                    self.navegarActividad = true // Activa la navegación
+                } else {
+                    // Si no se encuentra la actividad, mostrar un error o hacer alguna otra acción
+                    print("Actividad no encontrada")
+                }
             }
         }
     }
 }
 
 #Preview {
-    InicioOverhaul(unaActividad: Actividad2(idActividad: 3, idZona: 2, nombre: "PEPE", listaTarjetas: Tarjeta.datosEjemplo))
+    InicioOverhaul(idZona: 2)  // Pasa el idZona correcto según el contexto
 }
+
+

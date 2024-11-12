@@ -109,7 +109,7 @@ struct InicioView: View {
                                     .bold()
                                     .shadow(color: .gray, radius: 3, x: 0, y: 3)
                             }
-                            NavigationLink(destination: InicioOverhaul(unaActividad: Actividad2(idActividad: 1, idZona: 2, nombre: "Tutorial", listaTarjetas: Tarjeta.datosEjemplo))) {
+                            NavigationLink(destination: InicioOverhaul(idZona: 2)) {
                                 Text("Tutorial")
                                     .frame(width: 150, height: 150)
                                     .background(Capsule().fill(colorVerde))
