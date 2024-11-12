@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>VAG_Rounded_Black</string>
+		<string>VAG_Rounded_Light</string>
+		<string>OPTIVagRound-Bold</string>
+		<string>vag-rounded</string>
+		<string>Apercu Mono Pro Bold</string>
+	</array>
+</dict>
+</plist>
