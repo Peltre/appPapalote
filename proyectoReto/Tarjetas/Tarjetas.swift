@@ -109,6 +109,10 @@ class ActividadesDataManager {
         return url.appendingPathComponent("Actividades.json")
     }
     
+    func obtenerActividadPorId(_ idActividad: Int) -> Actividad2? {
+        return actividades.first { $0.idActividad == idActividad }
+    }
+    
     private func guardarDatos() {
         if let codificado = try? JSONEncoder().encode(actividades) {
             try? codificado.write(to: rutaArchivo())
@@ -177,6 +181,11 @@ class ActividadesViewModel: ObservableObject {
     
     @objc private func actualizarActividades() {
         actividadesFiltradas = ActividadesDataManager.shared.obtenerActividadesPorZona(idZona)
+    }
+    
+    /// Método para obtener una actividad específica por su ID
+    func obtenerActividadPorId(_ idActividad: Int) -> Actividad2? {
+        return ActividadesDataManager.shared.obtenerActividadPorId(idActividad)
     }
     
     deinit {
