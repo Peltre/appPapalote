@@ -1,19 +1,23 @@
 import SwiftUI
 
 struct ZonaDetallada: View, Identifiable {
-    var id: UUID = UUID() // Identificador único
+    var id: UUID = UUID()
     @State var TituloZona: String
     var idZona: Int
-    @State var enfocarActividadNombre: String? // Nombre de actividad a enfocar
+    @State var enfocarActividadNombre: String?
     
     @Environment(\.dismiss) private var dismiss
-    
     @StateObject private var actividadModel: ActividadesViewModel
     
-    init(TituloZona: String, idZona: Int) {
+    init(TituloZona: String, idZona: Int, enfocarActividadNombre: String? = nil) {
         self.TituloZona = TituloZona
         self.idZona = idZona
-        _actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
+        self._actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
+        self._enfocarActividadNombre = State(initialValue: enfocarActividadNombre)
+    }
+    
+    private func normalizeString(_ string: String) -> String {
+        return string.folding(options: .diacriticInsensitive, locale: .current).lowercased()
     }
     
     var body: some View {
@@ -23,7 +27,7 @@ struct ZonaDetallada: View, Identifiable {
                     .ignoresSafeArea()
                 
                 VStack {
-                    // Botón de retroceso y título
+                    // Back button and title
                     ZStack {
                         Button(action: {
                             dismiss()
@@ -44,48 +48,54 @@ struct ZonaDetallada: View, Identifiable {
                             .bold()
                     }
                     
-                    // Scrollable card stack for actividades using CacheAsyncImage
-                    // Scrollable card stack for actividades
-                    ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
-                        NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
-                            ZStack {
-                                // Find tarjeta with orden_lista == 1
-                                if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
-                                    AsyncImage(url: URL(string: backgroundImageUrl)) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    } placeholder: {
-                                        Color.gray.opacity(0.3) // Placeholder while loading
+                    ScrollViewReader { proxy in
+                        ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
+                            NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
+                                ZStack {
+                                    if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
+                                        AsyncImage(url: URL(string: backgroundImageUrl)) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Color.gray.opacity(0.3)
+                                        }
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .fill(.black.opacity(0.4))
+                                        )
                                     }
-                                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .fill(.black.opacity(0.4)) // Apply ultra-thin material overlay for more diffused look
-                                    )
+                                    
+                                    VStack {
+                                        Text("\(actividad.idActividad)")
+                                            .font(.largeTitle)
+                                            .bold()
+                                            .foregroundColor(.white)
+                                        Text(actividad.nombre)
+                                            .font(.title2)
+                                            .foregroundColor(.white)
+                                    }
                                 }
-
-                                VStack {
-                                    Text("\(actividad.idActividad)")
-                                        .font(.largeTitle)
-                                        .bold()
-                                        .foregroundColor(.white)
-                                    Text(actividad.nombre)
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                }
+                                .frame(width: UIScreen.screenWidth-65, height: 400) // Added fixed height
+                                .clipShape(RoundedRectangle(cornerRadius: 15))
+                                .id(normalizeString(actividad.nombre))
                             }
-                            .frame(width: UIScreen.screenWidth-60, height: UIScreen.screenHeight/1.7) // Set size to match demo card height
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                        }
+                        .padding(.top, 50)
+                        .padding(.bottom, 20)
+                        .onAppear {
+                            scrollToActivity(proxy: proxy)
+                        }
+                        .onChange(of: enfocarActividadNombre) { _ in
+                            scrollToActivity(proxy: proxy)
                         }
                     }
-                    .padding(.top, 90)
                     
                     Spacer()
                     
-                    // Footer con botón "Ir a la vista de mapa"
-                    NavigationLink(destination: MapaDetalladoZona(onSelectPath:  { selectedNombre in
-                        enfocarActividadNombre = selectedNombre.capitalized
+                    NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
+                        enfocarActividadNombre = selectedNombre
                     }, idZona: idZona)) {
                         Text("Ir a la vista de mapa")
                             .font(.headline)
@@ -97,15 +107,21 @@ struct ZonaDetallada: View, Identifiable {
                             .shadow(radius: 4)
                     }
                     .padding(.top, 15)
+                    .background(.red)
                 }
                 .navigationBarBackButtonHidden(true)
                 .background(.thinMaterial.opacity(0.8))
             }
         }
     }
+    
+    private func scrollToActivity(proxy: ScrollViewProxy) {
+        if let enfocarActividadNombre = enfocarActividadNombre {
+            let normalizedTargetName = normalizeString(enfocarActividadNombre)
+            proxy.scrollTo(normalizedTargetName, anchor: .leading)
+        }
+    }
 }
-
-
 
 struct CeldaJugador: View {
     var unaActividad: Actividad2

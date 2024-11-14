@@ -44,7 +44,7 @@ struct TemplateActividad2: View {
                 // Main content
                 ScrollView(.vertical, showsIndicators: false) {
                     // Back button
-                    ZStack(alignment: .top){
+                    ZStack(alignment: .topLeading){
                         
                         Button(action: {
                             dismiss()
@@ -53,10 +53,10 @@ struct TemplateActividad2: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 25)
-                                .foregroundColor(.white)
+                                .foregroundColor(.black)
                                 .bold()
                                 .padding(10)
-                                .background(Color(white: 0.15))
+                                .background(Color(white: 1))
                                 .clipShape(Circle())
                         }
                         .zIndex(2)
