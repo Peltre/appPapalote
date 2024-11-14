@@ -9,6 +9,9 @@ struct ZonaDetallada: View, Identifiable {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var actividadModel: ActividadesViewModel
     
+    @State private var scrollViewOffset: CGFloat = 0  // Track offset
+    @State private var scrollViewHeight: CGFloat = 0  // Store total scrollable height
+    
     init(TituloZona: String, idZona: Int, enfocarActividadNombre: String? = nil) {
         self.TituloZona = TituloZona
         self.idZona = idZona
@@ -48,56 +51,62 @@ struct ZonaDetallada: View, Identifiable {
                             .bold()
                     }
                     
-                    ScrollViewReader { proxy in
-                        ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
-                            NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
-                                ZStack {
-                                    if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
-                                        AsyncImage(url: URL(string: backgroundImageUrl)) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                        } placeholder: {
-                                            Color.gray.opacity(0.3)
-                                        }
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .fill(.black.opacity(0.4))
-                                        )
+                    ScrollView {
+                        VStack {
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear {
+                                        // Store the total scrollable height once it appears
+                                        scrollViewHeight = geometry.size.height
                                     }
-                                    
-                                    VStack {
-                                        Text("\(actividad.idActividad)")
-                                            .font(.largeTitle)
-                                            .bold()
-                                            .foregroundColor(.white)
-                                        Text(actividad.nombre)
-                                            .font(.title2)
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                .frame(width: UIScreen.screenWidth-65, height: 400) // Added fixed height
-                                .clipShape(RoundedRectangle(cornerRadius: 15))
-                                .id(normalizeString(actividad.nombre))
                             }
-                        }
-                        .padding(.top, 50)
-                        .padding(.bottom, 20)
-                        .onAppear {
-                            scrollToActivity(proxy: proxy)
-                        }
-                        .onChange(of: enfocarActividadNombre) { _ in
-                            scrollToActivity(proxy: proxy)
+                            .frame(height: 0) // Hidden, used only for size reference
+                            
+                            ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
+                                NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
+                                    ZStack {
+                                        if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
+                                            AsyncImage(url: URL(string: backgroundImageUrl)) { image in
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                            } placeholder: {
+                                                Color.gray.opacity(0.3)
+                                            }
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 15)
+                                                    .fill(.black.opacity(0.6))
+                                            )
+                                        }
+                                        
+                                        VStack {
+                                            Text("\(actividad.idActividad)")
+                                                .font(.system(size: 45))
+                                                .bold()
+                                                .foregroundColor(.white)
+                                            Text(actividad.nombre)
+                                                .font(.title)
+                                                .foregroundColor(.white)
+                                        }
+                                    }
+                                    .frame(width: UIScreen.screenWidth * 0.8, height: 500) // Flexible width, fixed height
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                }
+                            }
+                            .padding(.top, 110)
+                            .padding(.bottom, 20)
                         }
                     }
-                    
-                    Spacer()
+                    .content.offset(y: -scrollViewOffset) // Apply calculated offset
                     
                     NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
                         enfocarActividadNombre = selectedNombre
+                        print("Zona \(String(describing: enfocarActividadNombre))")
+                        // Call scrollToActivityWithPercentage with selectedNombre
+                        scrollToActivityWithPercentage(selectedNombre: selectedNombre)
                     }, idZona: idZona)) {
-                        Text("Ir a la vista de mapa")
+                        Text("Mapa Detallado")
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding()
@@ -115,45 +124,27 @@ struct ZonaDetallada: View, Identifiable {
         }
     }
     
-    private func scrollToActivity(proxy: ScrollViewProxy) {
-        if let enfocarActividadNombre = enfocarActividadNombre {
-            let normalizedTargetName = normalizeString(enfocarActividadNombre)
-            proxy.scrollTo(normalizedTargetName, anchor: .leading)
-        }
-    }
-}
+    private func scrollToActivityWithPercentage(selectedNombre: String) {
+        
+        // Normalize the target name for comparison
+        let normalizedTargetName = normalizeString(selectedNombre)
+        print("Normalized target name to find: \(normalizedTargetName)")
 
-struct CeldaJugador: View {
-    var unaActividad: Actividad2
-    var idZona: Int
-    var isHighlighted: Bool // Propiedad para determinar si se debe resaltar
-    
-    var body: some View {
-        HStack {
-            Text("\(unaActividad.idActividad)")
-                .font(.system(size: 30))
-                .foregroundStyle(colores[idZona]!)
-                .frame(width: 45)
-                .padding(4)
-                .background(Color(white: 1))
-                .clipShape(Circle())
-                .offset(x: 4)
-            Spacer()
-            Text(unaActividad.nombre)
-                .font(.system(size: 26))
-                .foregroundColor(.black)
-                .offset(x: UIScreen.screenWidth/10 - 65)
-            Spacer()
+        // Iterate and print each comparison for debugging
+        if let targetIndex = actividadModel.actividadesFiltradas.firstIndex(where: { actividad in
+            let normalizedActividadNombre = normalizeString(actividad.nombre)
+            print("Comparing with activity name: \(actividad.nombre) -> normalized: \(normalizedActividadNombre)")
+            return normalizedActividadNombre == normalizedTargetName
+        }) {
+            let totalItems = actividadModel.actividadesFiltradas.count
+            let scrollPercentage = CGFloat(targetIndex) / CGFloat(totalItems - 1)
+            
+            // Calculate and set the scroll offset based on the percentage of the total scrollable height
+            scrollViewOffset = scrollViewHeight * scrollPercentage
+            print("Found match at index \(targetIndex), scroll percentage: \(scrollPercentage), offset: \(scrollViewOffset)")
+        } else {
+            print("No match found for activity name: \(normalizedTargetName)")
         }
-        .padding(.vertical, 20)
-        .frame(width: UIScreen.screenWidth-40)
-        .background(.ultraThinMaterial)
-        .clipShape(.rect(cornerSize: CGSize(width: 18, height: 5)))
-        .overlay(
-            isHighlighted ? RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white, lineWidth: 4) // Borde iluminado
-            : nil
-        )
     }
 }
 

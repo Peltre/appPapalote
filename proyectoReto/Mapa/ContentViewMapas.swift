@@ -84,7 +84,6 @@ struct ContentViewMapas: View {
                         // Asigna la vista seleccionada a selectedZona
                         selectedZona = ZonaDetallada(TituloZona: String(clickedPath.name), idZona: idZona)
                     }
-                    print("\(self.clickedPath.name)")
                 }
                 .animation(.easeInOut(duration: 0.3), value: clickedPath)
         }

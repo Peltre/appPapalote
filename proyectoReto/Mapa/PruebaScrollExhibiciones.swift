@@ -2,8 +2,6 @@ import SwiftUI
 
 struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollection, Data.Element: Identifiable, Content: View {
     @Environment(\.layoutDirection) var layoutDirection
-    @State private var currentIndex: Int = 0
-    @State private var isDragging: Bool = false
     
     private let data: Data
     @ViewBuilder private let content: (Data.Element) -> Content
@@ -17,54 +15,26 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
         GeometryReader { geometry in
             let size = geometry.size
             
-            ScrollViewReader { scrollProxy in
+            ScrollView(.horizontal) {
                 if #available(iOS 17.0, *) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 0) {
-                            ForEach(Array(data.enumerated()), id: \.element.id) { (index, element) in
-                                GeometryReader { proxy in
-                                    content(element)
-                                        .padding(.horizontal, 64)
-                                        .frame(width: size.width)
-                                        .id(index)
-                                        .scaleEffect(scale(for: index, proxy: proxy))
-                                        .rotationEffect(rotation(for: index, proxy: proxy))
-                                        .offset(x: offset(for: index, proxy: proxy))
-                                        .zIndex(zIndex(for: index))
-                                        .contentShape(Rectangle()) // Makes entire area tappable
-                                        .onTapGesture {
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                                currentIndex = index
-                                                scrollProxy.scrollTo(index, anchor: .center)
-                                            }
-                                        }
-                                        .simultaneousGesture(
-                                            DragGesture(minimumDistance: 0)
-                                                .onChanged { _ in
-                                                    isDragging = true
-                                                }
-                                                .onEnded { value in
-                                                    isDragging = false
-                                                    if abs(value.translation.width) > size.width * 0.2 {
-                                                        let newIndex = value.translation.width > 0 ?
-                                                        max(currentIndex - 1, 0) :
-                                                        min(currentIndex + 1, Array(data).count - 1)
-                                                        
-                                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                                            currentIndex = newIndex
-                                                            scrollProxy.scrollTo(newIndex, anchor: .center)
-                                                        }
-                                                    }
-                                                }
-                                        )
-                                }
+                    HStack(spacing: 0) {
+                        ForEach(Array(data.enumerated()), id: \.element.id) { (index, element) in
+                            content(element)
+                                .padding(.horizontal, 64)
                                 .frame(width: size.width)
-                            }
+                                .visualEffect { content, geometryProxy in
+                                    content
+                                        .scaleEffect(scale(geometryProxy, scale: 0.1), anchor: .trailing)
+                                        .rotationEffect(rotation(geometryProxy, rotation: 2))
+                                        .offset(x: minX(geometryProxy))
+                                        .offset(x: excessMinX(geometryProxy, offset: 5)) // lo que sobre sale
+                                }
+                                .zIndex(zIndex(for: index))
                         }
-                        .padding(.vertical, 16)
-                        .scrollDisabled(isDragging)
                     }
+                    .padding(.vertical, 16)
                     .scrollTargetBehavior(.paging)
+                    .scrollIndicators(.hidden)
                 } else {
                     // Fallback on earlier versions
                 }
@@ -73,47 +43,52 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
         }
     }
     
-    private func progress(for index: Int, proxy: GeometryProxy) -> CGFloat {
-        if #available(iOS 17.0, *) {
-            let scrollViewWidth = proxy.bounds(of: .scrollView)?.width ?? 0
-            let minX = proxy.frame(in: .scrollView).minX
-            let progress = minX / scrollViewWidth
-            
-            return layoutDirection == .rightToLeft ? -progress : progress
-        } else {
-            // Fallback on earlier versions
-        }
-        return CGFloat(1)
-    }
-    
-    private func scale(for index: Int, proxy: GeometryProxy) -> CGFloat {
-        let progress = progress(for: index, proxy: proxy)
-        return 1 - (abs(progress) * 0.1)
-    }
-    
-    private func rotation(for index: Int, proxy: GeometryProxy) -> Angle {
-        let progress = progress(for: index, proxy: proxy)
-        return .degrees(progress * 5)
-    }
-    
-    private func offset(for index: Int, proxy: GeometryProxy) -> CGFloat {
-        let progress = progress(for: index, proxy: proxy)
-        let baseOffset = progress * 8
-        return layoutDirection == .rightToLeft ? -baseOffset : baseOffset
-    }
-    
     private func zIndex(for index: Int) -> Double {
-        let total = Array(data).count
-        if index == currentIndex {
-            return Double(total)
-        } else if index > currentIndex {
-            return Double(total - (index - currentIndex))
+        let maxIndex = data.count - 1
+        let reversedIndex = maxIndex - index
+        return Double(reversedIndex)
+    }
+    
+    private func minX(_ proxy: GeometryProxy) -> CGFloat {
+        if #available(iOS 17.0, *) {
+            let minX = proxy.frame(in: .scrollView).minX
+            return minX < 0 ? 0 : -minX
         } else {
-            return Double(total - (currentIndex - index))
+            return 0 // Fallback for earlier versions
         }
+    }
+    
+    private func progress(_ proxy: GeometryProxy, limit: CGFloat = 2) -> CGFloat {
+        if #available(iOS 17.0, *) {
+            let maxX = proxy.frame(in: .scrollView(axis: .horizontal)).maxX
+            let width = proxy.bounds(of: .scrollView(axis: .horizontal))?.width ?? 0
+            let progress = (maxX / width) - 1.0
+            if layoutDirection == .rightToLeft {
+                return min(abs(progress), limit)
+            } else {
+                return min(progress, limit)
+            }
+        } else {
+            return 0 // Fallback for earlier versions
+        }
+    }
+    
+    private func scale(_ proxy: GeometryProxy, scale: CGFloat = 0.1) -> CGFloat {
+        let progress = progress(proxy)
+        return 1 - (progress * scale)
+    }
+    
+    private func excessMinX(_ proxy: GeometryProxy, offset: CGFloat = 10) -> CGFloat {
+        let progress = progress(proxy)
+        return progress * offset
+    }
+    
+    private func rotation(_ proxy: GeometryProxy, rotation: CGFloat = 5) -> Angle {
+        let progress = progress(proxy)
+        return .init(degrees: progress * rotation)
     }
 }
-// Demo implementation remains the same
+
 struct DemoItem: Identifiable {
     var id = UUID()
     let name: String
@@ -151,6 +126,9 @@ struct DemoView: View {
                             .foregroundColor(.white)
                     )
                     .frame(width: 270)
+                    .onTapGesture {
+                        print("Click: \(namedColor.name)")
+                    }
             }
             
             Spacer()
@@ -161,6 +139,9 @@ struct DemoView: View {
     }
 }
 
-#Preview{
-    DemoView()
+// Preview for DemoView
+struct DemoView_Previews: PreviewProvider {
+    static var previews: some View {
+        DemoView()
+    }
 }
