@@ -48,59 +48,36 @@ struct InicioOverhaul: View {
 
     var body: some View {
         VStack {
-            ZStack {
-                switch selectedIndex {
-                case 0:
-                    NavigationView {
-                        Text("")
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Text("Inicio")
-                                        .foregroundColor(.white)
-                                        .bold()
-                                        .font(.system(size: 35))
-                                }
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Image("logoBlanco")
-                                        .resizable()
-                                        .frame(width: 80, height: 80)
-                                }
-                            }
-                            .frame(maxHeight: .infinity)
-                            .toolbarBackground(colorVerde, for: .navigationBar)
-                            .toolbarBackground(.visible, for: .navigationBar)
+            TabView {
+                HomePage()
+                    .tabItem() {
+                        Image(systemName: "house.fill")
+                        Text("Inicio")
                     }
-                default:
-                    NavigationView {
-                        VStack {
-                            Text("Pantalla de Inicio")
-                        }
-                        .navigationTitle("Inicio")
+                ContentViewMapas()
+                    .tabItem() {
+                        Image(systemName: "map.fill")
+                        Text("Mapa")
                     }
-                }
-            }
-
-            Spacer()
-            Divider()
-            HStack {
-                ForEach(0..<5, id:\.self) { number in
-                    Spacer()
-                    Button(action: {
-                        self.isPresentingScanner = true
-                    }, label: {
-                        if (icons[number] == "plus.app.fill") {
-                            Image(systemName: icons[number])
-                                .font(.system(size: 45, weight: .regular, design: .default))
-                                .foregroundColor(colorVerde)
-                        } else {
-                            Image(systemName: icons[number])
-                                .font(.system(size: 25, weight: .regular, design: .default))
-                                .foregroundColor(colorVerde)
-                        }
-                    })
-                    Spacer()
-                }
-            }
+                vistaEventos()
+                    .tabItem() {
+                        Image(systemName: "qrcode.viewfinder")
+                        Text("QR")
+                    }
+                vistaEventos()
+                    .tabItem() {
+                        Image(systemName: "questionmark")
+                        Text("Sorprendeme")
+                        
+                    }
+                    
+                Perfil()
+                    .tabItem() {
+                        Image(systemName: "person.circle.fill")
+                        Text("Perfil")
+                        
+                    }
+            }.tint(colorVerde)
             .sheet(isPresented: $isPresentingScanner) {
                 self.scannerSheet
             }
