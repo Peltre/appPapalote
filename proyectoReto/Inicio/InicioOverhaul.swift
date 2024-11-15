@@ -59,7 +59,7 @@ struct InicioOverhaul: View {
                         Image(systemName: "map.fill")
                         Text("Mapa")
                     }
-                vistaEventos()
+                QRScannerView()
                     .tabItem() {
                         Image(systemName: "qrcode.viewfinder")
                         Text("QR")
