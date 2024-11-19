@@ -17,8 +17,7 @@ struct InicioOverhaul: View {
     @State var actividadEncontrada: Actividad2? = nil // Guardar la actividad escaneada
 
     @StateObject private var actividadModel: ActividadesViewModel
-    
-    // Inicialización del ViewModel
+
     init(idZona: Int) {
         _actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
     }
@@ -48,39 +47,52 @@ struct InicioOverhaul: View {
 
     var body: some View {
         VStack {
-            TabView {
+            TabView(selection: $selectedIndex) {
                 HomePage()
-                    .tabItem() {
+                    .tabItem {
                         Image(systemName: "house.fill")
                         Text("Inicio")
                     }
+                    .tag(0)
+                
                 ContentViewMapas()
-                    .tabItem() {
+                    .tabItem {
                         Image(systemName: "map.fill")
                         Text("Mapa")
                     }
-                QRScannerView()
-                    .tabItem() {
+                    .tag(1)
+                
+                // Esta pestaña no tiene una vista asociada
+                Text("")
+                    .tabItem {
                         Image(systemName: "qrcode.viewfinder")
                         Text("QR")
                     }
+                    .tag(2)
+                
                 vistaEventos()
-                    .tabItem() {
+                    .tabItem {
                         Image(systemName: "questionmark")
                         Text("Sorprendeme")
-                        
                     }
-                    
+                    .tag(3)
+                
                 Perfil()
-                    .tabItem() {
+                    .tabItem {
                         Image(systemName: "person.circle.fill")
                         Text("Perfil")
-                        
                     }
-            }.tint(colorVerde)
+                    .tag(4)
+            }
+            .onChange(of: selectedIndex) { newValue in
+                if newValue == 2 { // Detecta cuando se selecciona la pestaña de "QR"
+                    isPresentingScanner = true
+                }
+            }
             .sheet(isPresented: $isPresentingScanner) {
                 self.scannerSheet
             }
+            .tint(colorVerde)
         }
         .background(
             NavigationLink(
@@ -93,22 +105,20 @@ struct InicioOverhaul: View {
     }
 
     private func processScannedCode(_ code: String) {
-        // Verificar si el código QR coincide con el formato esperado para la actividad
         if code.starts(with: "actividad:") {
             let components = code.split(separator: ":")
             if let idString = components.last, let id = Int(idString) {
-                // Intentar obtener la actividad por ID usando el ActividadesViewModel
                 if let actividad = actividadModel.obtenerActividadPorId(id) {
                     self.actividadEncontrada = actividad
-                    self.navegarActividad = true // Activa la navegación
+                    self.navegarActividad = true
                 } else {
-                    // Si no se encuentra la actividad, mostrar un error o hacer alguna otra acción
                     print("Actividad no encontrada")
                 }
             }
         }
     }
 }
+
 
 #Preview {
     InicioOverhaul(idZona: 2)  // Pasa el idZona correcto según el contexto
