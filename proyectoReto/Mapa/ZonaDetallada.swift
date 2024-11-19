@@ -29,7 +29,19 @@ struct ZonaDetallada: View, Identifiable {
                 colores[idZona]!
                     .ignoresSafeArea()
                 
-                VStack {
+                Rectangle()
+                    .fill(.thinMaterial)
+                    .frame(width: UIScreen.screenWidth, height: 240)
+                    .offset(y:-UIScreen.screenHeight / 2)
+                    .shadow(radius: 10, y: 5)
+                
+                Rectangle()
+                    .fill(.thinMaterial)
+                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenHeight/3)
+                    .offset(y:UIScreen.screenHeight / 2)
+                    .shadow(radius: 10, y: 5)
+                
+                VStack(spacing: 20){
                     // Back button and title
                     ZStack {
                         Button(action: {
@@ -43,6 +55,7 @@ struct ZonaDetallada: View, Identifiable {
                                 .padding(10)
                                 .background(Color(white: 1))
                                 .clipShape(Circle())
+                                .shadow(radius: 3, y: 2)
                         }
                         .offset(x: -UIScreen.screenWidth / 2 + 35)
                         
@@ -51,17 +64,8 @@ struct ZonaDetallada: View, Identifiable {
                             .bold()
                     }
                     
-                    ScrollView {
-                        VStack {
-                            GeometryReader { geometry in
-                                Color.clear
-                                    .onAppear {
-                                        // Store the total scrollable height once it appears
-                                        scrollViewHeight = geometry.size.height
-                                    }
-                            }
-                            .frame(height: 0) // Hidden, used only for size reference
-                            
+                    ScrollViewReader { scrollProxy in
+                        ScrollView {
                             ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
                                 NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
                                     ZStack {
@@ -90,62 +94,62 @@ struct ZonaDetallada: View, Identifiable {
                                                 .foregroundColor(.white)
                                         }
                                     }
-                                    .frame(width: UIScreen.screenWidth * 0.8, height: 500) // Flexible width, fixed height
                                     .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    
                                 }
+                                .id(actividad.idActividad) // Assign an ID based on activity
                             }
-                            .padding(.top, 110)
-                            .padding(.bottom, 20)
                         }
+                        .onChange(of: enfocarActividadNombre) { newValue in
+                            if let newValue = newValue {
+                                scrollToActivity(scrollProxy: scrollProxy, selectedNombre: newValue)
+                            }
+                        }
+                        .background(.red)
                     }
-                    .content.offset(y: -scrollViewOffset) // Apply calculated offset
                     
                     NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
                         enfocarActividadNombre = selectedNombre
                         print("Zona \(String(describing: enfocarActividadNombre))")
-                        // Call scrollToActivityWithPercentage with selectedNombre
-                        scrollToActivityWithPercentage(selectedNombre: selectedNombre)
                     }, idZona: idZona)) {
                         Text("Mapa Detallado")
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding()
-                            .frame(maxWidth: 220)
+                            .frame(width: 300, height: 60)
                             .background(colores[idZona] ?? Color.gray)
-                            .cornerRadius(10)
+                            .cornerRadius(30)
                             .shadow(radius: 4)
                     }
-                    .padding(.top, 15)
-                    .background(.red)
+
                 }
                 .navigationBarBackButtonHidden(true)
                 .background(.thinMaterial.opacity(0.8))
             }
         }
     }
-    
-    private func scrollToActivityWithPercentage(selectedNombre: String) {
-        
+
+    private func scrollToActivity(scrollProxy: ScrollViewProxy, selectedNombre: String) {
         // Normalize the target name for comparison
         let normalizedTargetName = normalizeString(selectedNombre)
         print("Normalized target name to find: \(normalizedTargetName)")
 
-        // Iterate and print each comparison for debugging
-        if let targetIndex = actividadModel.actividadesFiltradas.firstIndex(where: { actividad in
+        // Find the matching activity
+        if let targetActividad = actividadModel.actividadesFiltradas.first(where: { actividad in
             let normalizedActividadNombre = normalizeString(actividad.nombre)
-            print("Comparing with activity name: \(actividad.nombre) -> normalized: \(normalizedActividadNombre)")
             return normalizedActividadNombre == normalizedTargetName
         }) {
-            let totalItems = actividadModel.actividadesFiltradas.count
-            let scrollPercentage = CGFloat(targetIndex) / CGFloat(totalItems - 1)
-            
-            // Calculate and set the scroll offset based on the percentage of the total scrollable height
-            scrollViewOffset = scrollViewHeight * scrollPercentage
-            print("Found match at index \(targetIndex), scroll percentage: \(scrollPercentage), offset: \(scrollViewOffset)")
+            print("Scrolling to activity with ID: \(targetActividad.idActividad)")
+            // Scroll to the activity ID with animation
+            withAnimation(.easeInOut) {
+                scrollProxy.scrollTo(targetActividad.idActividad, anchor: .center)
+            }
         } else {
             print("No match found for activity name: \(normalizedTargetName)")
         }
     }
+
+
 }
 
 #Preview {

@@ -15,7 +15,7 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
         GeometryReader { geometry in
             let size = geometry.size
             
-            ScrollView(.horizontal) {
+            ScrollView(.horizontal, showsIndicators: false) {
                 if #available(iOS 17.0, *) {
                     HStack(spacing: 0) {
                         ForEach(Array(data.enumerated()), id: \.element.id) { (index, element) in
@@ -25,7 +25,7 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
                                 .visualEffect { content, geometryProxy in
                                     content
                                         .scaleEffect(scale(geometryProxy, scale: 0.1), anchor: .trailing)
-                                        .rotationEffect(rotation(geometryProxy, rotation: 2))
+                                        .rotationEffect(rotation(geometryProxy, rotation: 1))
                                         .offset(x: minX(geometryProxy))
                                         .offset(x: excessMinX(geometryProxy, offset: 5)) // lo que sobre sale
                                 }
