@@ -1,5 +1,4 @@
 import SwiftUI
-
 struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollection, Data.Element: Identifiable, Content: View {
     @Environment(\.layoutDirection) var layoutDirection
     
@@ -24,22 +23,22 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
                                 .frame(width: size.width)
                                 .visualEffect { content, geometryProxy in
                                     content
-                                        .scaleEffect(scale(geometryProxy, scale: 0.1), anchor: .trailing)
-                                        .rotationEffect(rotation(geometryProxy, rotation: 1))
+                                        .scaleEffect(scale(geometryProxy, scale: 0.05), anchor: .trailing)
+                                        .rotationEffect(rotation(geometryProxy, rotation: 4))
                                         .offset(x: minX(geometryProxy))
                                         .offset(x: excessMinX(geometryProxy, offset: 5)) // lo que sobre sale
                                 }
                                 .zIndex(zIndex(for: index))
+                                .padding(.vertical,UIScreen.screenHeight/8)
                         }
                     }
-                    .padding(.vertical, 16)
                     .scrollTargetBehavior(.paging)
                     .scrollIndicators(.hidden)
                 } else {
                     // Fallback on earlier versions
                 }
             }
-            .frame(height: 410)
+            
         }
     }
     
@@ -88,13 +87,11 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
         return .init(degrees: progress * rotation)
     }
 }
-
 struct DemoItem: Identifiable {
     var id = UUID()
     let name: String
     let color: Color
 }
-
 struct DemoView: View {
     var body: some View {
         let colors = [
@@ -130,6 +127,7 @@ struct DemoView: View {
                         print("Click: \(namedColor.name)")
                     }
             }
+            .background(.blue)
             
             Spacer()
             
@@ -138,7 +136,6 @@ struct DemoView: View {
         }
     }
 }
-
 // Preview for DemoView
 struct DemoView_Previews: PreviewProvider {
     static var previews: some View {

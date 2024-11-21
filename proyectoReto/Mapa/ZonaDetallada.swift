@@ -1,5 +1,4 @@
 import SwiftUI
-
 struct ZonaDetallada: View, Identifiable {
     var id: UUID = UUID()
     @State var TituloZona: String
@@ -29,21 +28,14 @@ struct ZonaDetallada: View, Identifiable {
                 colores[idZona]!
                     .ignoresSafeArea()
                 
-                Rectangle()
+                RoundedRectangle(cornerSize: CGSize(width: 30, height: 30))
                     .fill(.thinMaterial)
-                    .frame(width: UIScreen.screenWidth, height: 240)
-                    .offset(y:-UIScreen.screenHeight / 2)
-                    .shadow(radius: 10, y: 5)
+                    .frame(width: UIScreen.screenWidth*0.9, height: 620)
                 
-                Rectangle()
-                    .fill(.thinMaterial)
-                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenHeight/3)
-                    .offset(y:UIScreen.screenHeight / 2)
-                    .shadow(radius: 10, y: 5)
-                
-                VStack(spacing: 20){
+                VStack {
                     // Back button and title
                     ZStack {
+                        
                         Button(action: {
                             dismiss()
                         }) {
@@ -64,49 +56,7 @@ struct ZonaDetallada: View, Identifiable {
                             .bold()
                     }
                     
-                    ScrollViewReader { scrollProxy in
-                        ScrollView {
-                            ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
-                                NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
-                                    ZStack {
-                                        if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
-                                            AsyncImage(url: URL(string: backgroundImageUrl)) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                            } placeholder: {
-                                                Color.gray.opacity(0.3)
-                                            }
-                                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 15)
-                                                    .fill(.black.opacity(0.6))
-                                            )
-                                        }
-                                        
-                                        VStack {
-                                            Text("\(actividad.idActividad)")
-                                                .font(.system(size: 45))
-                                                .bold()
-                                                .foregroundColor(.white)
-                                            Text(actividad.nombre)
-                                                .font(.title)
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-                                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                                    
-                                }
-                                .id(actividad.idActividad) // Assign an ID based on activity
-                            }
-                        }
-                        .onChange(of: enfocarActividadNombre) { newValue in
-                            if let newValue = newValue {
-                                scrollToActivity(scrollProxy: scrollProxy, selectedNombre: newValue)
-                            }
-                        }
-                        .background(.red)
-                    }
+                    Spacer()
                     
                     NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
                         enfocarActividadNombre = selectedNombre
@@ -121,19 +71,57 @@ struct ZonaDetallada: View, Identifiable {
                             .cornerRadius(30)
                             .shadow(radius: 4)
                     }
-
                 }
                 .navigationBarBackButtonHidden(true)
-                .background(.thinMaterial.opacity(0.8))
+                .frame(width: UIScreen.screenWidth)
+                .background(.thinMaterial.opacity(0.3))
+                
+                ScrollViewReader { scrollProxy in
+                    ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
+                        NavigationLink(destination: TemplateActividad2(unaActividad: actividad)) {
+                            ZStack {
+                                if let backgroundImageUrl = actividad.listaTarjetas.first(where: { $0.ordenLista == 1 })?.imagenUrl {
+                                    AsyncImage(url: URL(string: backgroundImageUrl)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    } placeholder: {
+                                        Color.gray.opacity(0.3)
+                                    }
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(.black.opacity(0.6))
+                                    )
+                                }
+                                VStack {
+                                    Text("\(actividad.idActividad)")
+                                        .font(.system(size: 45))
+                                        .bold()
+                                        .foregroundColor(.white)
+                                    Text(actividad.nombre)
+                                        .font(.title)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .frame(width: UIScreen.screenWidth * 0.85, height: UIScreen.screenHeight * 0.6) // Flexible width, fixed height
+                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                        }
+                        .id(actividad.idActividad) // Assign an ID based on activity
+                    }
+                    .onChange(of: enfocarActividadNombre) { newValue in
+                        if let newValue = newValue {
+                            scrollToActivity(scrollProxy: scrollProxy, selectedNombre: newValue)
+                        }
+                    }
+                }
             }
         }
     }
-
     private func scrollToActivity(scrollProxy: ScrollViewProxy, selectedNombre: String) {
         // Normalize the target name for comparison
         let normalizedTargetName = normalizeString(selectedNombre)
         print("Normalized target name to find: \(normalizedTargetName)")
-
         // Find the matching activity
         if let targetActividad = actividadModel.actividadesFiltradas.first(where: { actividad in
             let normalizedActividadNombre = normalizeString(actividad.nombre)
@@ -148,10 +136,8 @@ struct ZonaDetallada: View, Identifiable {
             print("No match found for activity name: \(normalizedTargetName)")
         }
     }
-
-
 }
-
 #Preview {
     ZonaDetallada(TituloZona: "Pertenezco", idZona: 2)
 }
+
