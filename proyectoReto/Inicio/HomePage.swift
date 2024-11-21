@@ -17,18 +17,64 @@ struct HomePage: View {
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         
         appearance.titleTextAttributes = [
-                    .foregroundColor: UIColor.white
-                ]
+            .foregroundColor: UIColor.white
+        ]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
+    
     var body: some View {
-        NavigationView {
-            Text("")
+            NavigationView {
+            
+                VStack {
+                    NavigationLink(destination: vistaEventos()) {
+                        RoundedRectangleCard(text: "Eventos", imageName: "cine")
+                    }
+                    
+                        .padding(.bottom, 40)
+                        
+                    NavigationLink(destination: vistaNoticias()) {
+                        RoundedRectangleCard(text: "Noticias",
+                                             imageName: "papalotl")
+                    }
+                    .padding(.bottom, 120)
+                }
+                .padding()
                 .navigationTitle("Inicio")
+                
+            }
+            
+        
+    }
+}
+
+struct RoundedRectangleCard: View {
+    var text : String
+    var imageName : String
+    var colorVerde = Color(red: 190 / 255.0, green: 214 / 255.0, blue: 0 / 255.0)
+
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(colorVerde)
+                .shadow(radius: 5)
+            
+            VStack {
+                Text(text)
+                    .font(.headline)
+                    .foregroundStyle(Color.white)
+                    .bold()
+                Image(imageName)
+                    .resizable()
+                
+            }
+            .padding(5)
         }
+        .frame(height: 180)
     }
 }
 

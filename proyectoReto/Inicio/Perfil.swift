@@ -9,13 +9,15 @@ import SwiftUI
 
 struct Perfil: View {
     
-    @State private var fotoPerfil: String = "quincy"
+    
+    @EnvironmentObject var perfilViewModel: PerfilViewModel
+    @State private var fotoPerfil: String = "oso"
     @Environment(\.presentationMode) var presentationMode
     @State private var navegarASignIn = false
     @State private var isEditing: Bool = false
     @State private var isView: Bool = false
     
-    private let fotos = ["quincy", "obyn", "si", "jason", "pat"]
+    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "pat"]
     
     var body: some View {
         NavigationStack {
@@ -202,6 +204,12 @@ struct Perfil: View {
 #Preview {
     Perfil()
 }
+
+
+class PerfilViewModel: ObservableObject {
+    @Published var fotoPerfil: String = "quincy" // Valor inicial
+}
+
 
 func borrarUsuario() {
     let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json")
