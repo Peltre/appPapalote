@@ -25,13 +25,26 @@ struct HomePage: View {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
+    @EnvironmentObject var perfilViewModel: PerfilViewModel
     
     var body: some View {
             NavigationView {
             
                 VStack {
+                    
+                    Image(perfilViewModel.fotoPerfil)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.circle)
+                        .frame(width: 100, height: 100)
+                        .padding(.top, 20)
+                    Text("Bienvenid@ \(perfilViewModel.nombreUsuario)")
+                        .font(.title3)
+                        .bold()
+                    
                     NavigationLink(destination: vistaEventos()) {
                         RoundedRectangleCard(text: "Eventos", imageName: "cine")
+                        
                     }
                     
                         .padding(.bottom, 40)
@@ -80,4 +93,5 @@ struct RoundedRectangleCard: View {
 
 #Preview {
     HomePage()
+        .environmentObject(PerfilViewModel())
 }

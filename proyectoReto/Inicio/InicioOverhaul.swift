@@ -17,6 +17,7 @@ struct InicioOverhaul: View {
     @State var actividadEncontrada: Actividad2? = nil // Guardar la actividad escaneada
 
     @StateObject private var actividadModel: ActividadesViewModel
+    
 
     init(idZona: Int) {
         _actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
@@ -121,7 +122,9 @@ struct InicioOverhaul: View {
 
 
 #Preview {
-    InicioOverhaul(idZona: 2)  // Pasa el idZona correcto según el contexto
+    InicioOverhaul(idZona: 2)
+        .environmentObject(PerfilViewModel())
+    // Pasa el idZona correcto según el contexto
 }
 
 
