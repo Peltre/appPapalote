@@ -11,7 +11,7 @@ struct user: Codable {
     let idUsuario: Int
     let username: String
     let correo : String
-    let pfp: String
+    let pfp: Int
 
     // CodingKeys para mapear las propiedades al JSON
     enum CodingKeys: String, CodingKey {

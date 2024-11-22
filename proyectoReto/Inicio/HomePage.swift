@@ -25,6 +25,9 @@ struct HomePage: View {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
+    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "oso", "oso", "oso"]
+
+    
     @EnvironmentObject var perfilViewModel: PerfilViewModel
     
     var body: some View {
@@ -32,7 +35,7 @@ struct HomePage: View {
             
                 VStack {
                     
-                    Image(perfilViewModel.fotoPerfil)
+                    Image(fotos[perfilViewModel.fotoPerfil])
                         .resizable()
                         .scaledToFit()
                         .clipShape(.circle)
@@ -59,11 +62,15 @@ struct HomePage: View {
                 .padding()
                 .navigationTitle("Inicio")
                 .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    perfilViewModel.cargarUsuario()
+                }
                 
             }
             
         
     }
+    
 }
 
 struct RoundedRectangleCard: View {
