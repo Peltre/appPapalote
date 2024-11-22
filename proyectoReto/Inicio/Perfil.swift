@@ -52,6 +52,15 @@
                             }
                             
                             Button {
+                                if editingName == true {
+                                    perfilViewModel.actualizarUsuario { success in
+                                        if success {
+                                        
+                                            print("Nombre actualizado papu")
+                                        }
+                                    }
+                                }
+                                
                                 withAnimation {
                                     editingName.toggle()
                                 }
@@ -276,6 +285,66 @@
             }
         }
         
+        func actualizarUsuario(completition: @escaping (Bool) -> Void) {
+            guard let url = URL(string: "https://r1aguilar.pythonanywhere.com/modificar_usuario") else {
+                print("URL Inválida")
+                completition(false)
+                return
+            }
+            
+            guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json"),
+                  let data = try? Data(contentsOf: fileURL),
+                  let usuario = try? JSONDecoder().decode(user.self, from: data) else {
+                print("Error cargando el usuario actual")
+                completition(false)
+                return
+            }
+            
+            // Crear el diccionario solo con los campos necesarios
+            let datosActualizados: [String: Any] = [
+                "id": usuario.idUsuario,
+                "username": nombreUsuario,  // nuevo nombre de usuario
+                "pfp": fotoPerfil + 1        // pfp sin cambios
+            ]
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: datosActualizados) else {
+                print("Error al serializar los datos")
+                completition(false)
+                return
+            }
+            
+            print("JSON enviado al servidor:", String(data: jsonData, encoding: .utf8) ?? "Error al convertir JSON a string")
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = jsonData
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error en la solicitud: \(error.localizedDescription)")
+                    completition(false)
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    print("Respuesta del servidor no válida")
+                    completition(false)
+                    return
+                }
+                
+                if httpResponse.statusCode == 200 {
+                    print("Datos actualizados correctamente")
+                    completition(true)
+                } else {
+                    print("Error del servidor: \(httpResponse.statusCode)")
+                    if let data = data {
+                        print("Respuesta del servidor:", String(data: data, encoding: .utf8) ?? "No se pudo leer la respuesta")
+                    }
+                    completition(false)
+                }
+            }.resume()
+        }
 }
 
 
