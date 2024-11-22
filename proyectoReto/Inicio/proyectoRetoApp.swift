@@ -25,7 +25,7 @@ struct proyectoRetoApp: App {
     var body: some Scene {
         WindowGroup {
             if usuario != nil {
-                InicioView()
+                InicioOverhaul(idZona: 2)
                     .environmentObject(PerfilViewModel()) // Proporciona el ViewModel como EnvironmentObject
             } else {
                 SignIn()

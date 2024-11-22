@@ -58,6 +58,7 @@ struct HomePage: View {
                 }
                 .padding()
                 .navigationTitle("Inicio")
+                .navigationBarTitleDisplayMode(.inline)
                 
             }
             
