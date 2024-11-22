@@ -78,7 +78,7 @@ struct SignIn: View {
             }
             .navigationBarBackButtonHidden(true)
             .navigationDestination(isPresented: $isAuthenticated) {
-                InicioView() // Navega a InicioView cuando isAuthenticated es true
+                InicioOverhaul(idZona: 2) // Navega a InicioView cuando isAuthenticated es true
             }
         }
     }

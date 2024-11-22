@@ -15,7 +15,6 @@ struct proyectoRetoApp: App {
     @State private var isLoading = false
     @EnvironmentObject var perfilViewModel: PerfilViewModel
 
-    
     init() {
         _ = ActividadesDataManager.shared
         // Necesitamos usar _usuario para modificar el State directamente en init

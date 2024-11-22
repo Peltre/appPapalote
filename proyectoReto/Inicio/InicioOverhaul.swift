@@ -47,62 +47,66 @@ struct InicioOverhaul: View {
     ]
 
     var body: some View {
-        VStack {
-            TabView(selection: $selectedIndex) {
-                HomePage()
-                    .tabItem {
-                        Image(systemName: "house.fill")
-                        Text("Inicio")
-                    }
-                    .tag(0)
-                
-                ContentViewMapas()
-                    .tabItem {
-                        Image(systemName: "map.fill")
-                        Text("Mapa")
-                    }
-                    .tag(1)
-                
-                // Esta pestaña no tiene una vista asociada
-                Text("")
-                    .tabItem {
-                        Image(systemName: "qrcode.viewfinder")
-                        Text("QR")
-                    }
-                    .tag(2)
-                
-                vistaEventos()
-                    .tabItem {
-                        Image(systemName: "questionmark")
-                        Text("Sorprendeme")
-                    }
-                    .tag(3)
-                
-                Perfil()
-                    .tabItem {
-                        Image(systemName: "person.circle.fill")
-                        Text("Perfil")
-                    }
-                    .tag(4)
-            }
-            .onChange(of: selectedIndex) { newValue in
-                if newValue == 2 { // Detecta cuando se selecciona la pestaña de "QR"
-                    isPresentingScanner = true
+        NavigationView {
+            VStack {
+                TabView(selection: $selectedIndex) {
+                    HomePage()
+                        .tabItem {
+                            Image(systemName: "house.fill")
+                            Text("Inicio")
+                        }
+                        .tag(0)
+                    
+                    ContentViewMapas()
+                        .tabItem {
+                            Image(systemName: "map.fill")
+                            Text("Mapa")
+                        }
+                        .tag(1)
+                    
+                    // Esta pestaña no tiene una vista asociada
+                    Text("")
+                        .tabItem {
+                            Image(systemName: "qrcode.viewfinder")
+                            Text("QR")
+                        }
+                        .tag(2)
+                    
+                    vistaEventos()
+                        .tabItem {
+                            Image(systemName: "questionmark")
+                            Text("Sorprendeme")
+                        }
+                        .tag(3)
+                    
+                    Perfil()
+                        .tabItem {
+                            Image(systemName: "person.circle.fill")
+                            Text("Perfil")
+                        }
+                        .tag(4)
                 }
+                .onChange(of: selectedIndex) { newValue in
+                    if newValue == 2 { // Detecta cuando se selecciona la pestaña de "QR"
+                        isPresentingScanner = true
+                        print("Se activo el escanner")
+                    }
+                }
+                .sheet(isPresented: $isPresentingScanner) {
+                    self.scannerSheet
+                }
+                .tint(colorVerde)
             }
-            .sheet(isPresented: $isPresentingScanner) {
-                self.scannerSheet
-            }
-            .tint(colorVerde)
+            .background(
+                NavigationLink(
+                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo)),
+                    isActive: $navegarActividad
+                ) {
+                    EmptyView()
+                }
+            )
+            .navigationBarHidden(true)
         }
-        .background(
-            NavigationLink(
-                destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo)),
-                isActive: $navegarActividad
-            ) {
-                EmptyView()
-            }
-        )
     }
 
     private func processScannedCode(_ code: String) {
@@ -112,6 +116,7 @@ struct InicioOverhaul: View {
                 if let actividad = actividadModel.obtenerActividadPorId(id) {
                     self.actividadEncontrada = actividad
                     self.navegarActividad = true
+                    print("Se activo navegar act")
                 } else {
                     print("Actividad no encontrada")
                 }
