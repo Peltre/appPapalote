@@ -99,13 +99,13 @@ struct InicioOverhaul: View {
             }
             .background(
                 NavigationLink(
-                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo)),
+                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo))
+                        .navigationBarHidden(true),
                     isActive: $navegarActividad
                 ) {
                     EmptyView()
                 }
             )
-            .navigationBarHidden(true)
         }
     }
 
