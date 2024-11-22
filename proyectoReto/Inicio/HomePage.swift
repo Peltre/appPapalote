@@ -52,7 +52,7 @@ struct HomePage: View {
                         
                     NavigationLink(destination: vistaNoticias()) {
                         RoundedRectangleCard(text: "Noticias",
-                                             imageName: "papalotl")
+                        imageName: "papalotl")
                     }
                     .padding(.bottom, 120)
                 }
