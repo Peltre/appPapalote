@@ -25,10 +25,10 @@ struct HomePage: View {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
-    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "oso", "oso", "oso"]
-
-    
     @EnvironmentObject var perfilViewModel: PerfilViewModel
+    
+    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "tlacuache", "oso", "oso"]
+
     
     var body: some View {
             NavigationView {
@@ -63,14 +63,13 @@ struct HomePage: View {
                 .navigationTitle("Inicio")
                 .navigationBarTitleDisplayMode(.inline)
                 .onAppear {
-                    perfilViewModel.cargarUsuario()
+                    perfilViewModel.cargarUsername()
                 }
                 
             }
             
         
     }
-    
 }
 
 struct RoundedRectangleCard: View {

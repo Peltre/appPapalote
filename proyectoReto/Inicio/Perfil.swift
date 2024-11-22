@@ -255,6 +255,27 @@
         
     }
         
+        func cargarUsername() {
+            guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json") else {
+                print("Error: No se pudo obtener la URL del archivo de sesión")
+                return
+            }
+            
+            // Try to load the data
+            do {
+                let data = try Data(contentsOf: fileURL)
+                let usuario = try JSONDecoder().decode(user.self, from: data)
+                
+                // Update the properties with the loaded user data
+                DispatchQueue.main.async {
+                    self.nombreUsuario = usuario.username
+                }
+                
+            } catch {
+                print("Error al cargar los datos del usuario: \(error)")
+            }
+        }
+        
 }
 
 
