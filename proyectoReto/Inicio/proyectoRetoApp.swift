@@ -13,7 +13,8 @@ struct proyectoRetoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var usuario: user?
     @State private var isLoading = false
-    
+    @EnvironmentObject var perfilViewModel: PerfilViewModel
+
     init() {
         _ = ActividadesDataManager.shared
         // Necesitamos usar _usuario para modificar el State directamente en init
@@ -23,10 +24,14 @@ struct proyectoRetoApp: App {
     var body: some Scene {
         WindowGroup {
             if usuario != nil {
-                InicioView()
+                InicioOverhaul(idZona: 2)
+                    .environmentObject(PerfilViewModel()) // Proporciona el ViewModel como EnvironmentObject
             } else {
                 SignIn()
+                    .environmentObject(PerfilViewModel()) // Proporciona el ViewModel como EnvironmentObject
+
             }
+            
         }
     }
     

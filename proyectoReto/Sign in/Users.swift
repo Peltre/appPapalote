@@ -9,9 +9,9 @@ import Foundation
 
 struct user: Codable {
     let idUsuario: Int
-    let username: String
+    var username: String
     let correo : String
-    let pfp: String
+    var pfp: Int
 
     // CodingKeys para mapear las propiedades al JSON
     enum CodingKeys: String, CodingKey {

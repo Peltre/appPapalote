@@ -18,23 +18,36 @@ struct InicioOverhaul: View {
 
     @StateObject private var actividadModel: ActividadesViewModel
     
-    // Inicialización del ViewModel
+
     init(idZona: Int) {
         _actividadModel = StateObject(wrappedValue: ActividadesViewModel(idZona: idZona))
     }
 
     var scannerSheet: some View {
-        CodeScannerView(
-            codeTypes: [.qr],
-            completion: { result in
-                if case let .success(code) = result {
-                    self.scannedCode = code.string
-                    self.isPresentingScanner = false
-                    processScannedCode(code.string)
+        ZStack {
+            CodeScannerView(
+                codeTypes: [.qr],
+                completion: { result in
+                    if case let .success(code) = result {
+                        self.scannedCode = code.string
+                        self.isPresentingScanner = false
+                        processScannedCode(code.string)
+                    }
                 }
+            )
+            VStack {
+                Spacer()
+                Text("Apunta la cámara al código QR")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(10)
+                    .padding(.bottom, 50)
             }
-        )
+        }
     }
+
 
     var colorVerde = Color(red: 190 / 255.0, green: 214 / 255.0, blue: 0 / 255.0)
 
@@ -47,85 +60,106 @@ struct InicioOverhaul: View {
     ]
 
     var body: some View {
-        VStack {
-            ZStack {
-                switch selectedIndex {
-                case 0:
-                    NavigationView {
-                        Text("")
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Text("Inicio")
-                                        .foregroundColor(.white)
-                                        .bold()
-                                        .font(.system(size: 35))
-                                }
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Image("logoBlanco")
-                                        .resizable()
-                                        .frame(width: 80, height: 80)
-                                }
-                            }
-                            .frame(maxHeight: .infinity)
-                            .toolbarBackground(colorVerde, for: .navigationBar)
-                            .toolbarBackground(.visible, for: .navigationBar)
-                    }
-                default:
-                    NavigationView {
-                        VStack {
-                            Text("Pantalla de Inicio")
+        NavigationView {
+            VStack {
+                TabView(selection: $selectedIndex) {
+                    HomePage()
+                        .tabItem {
+                            Image(systemName: "house.fill")
+                            Text("Inicio")
                         }
-                        .navigationTitle("Inicio")
+                        .tag(0)
+                    
+                    ContentViewMapas()
+                        .tabItem {
+                            Image(systemName: "map.fill")
+                            Text("Mapa")
+                        }
+                        .tag(1)
+                    
+                    // Cambia el contenido de la pestaña QR
+                    VStack(spacing: 20) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .foregroundColor(colorVerde)
+                        
+                        Text("Escanea un código QR")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                        
+                        Text("Pulsa en el botón de escáner para activar la cámara y escanear un código QR.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                        
+                        // Botón para abrir la cámara
+                        Button(action: {
+                            isPresentingScanner = true
+                        }) {
+                            Text("Escanear")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(colorVerde)
+                                .cornerRadius(10)
+                        }
+                    }
+                    .tabItem {
+                        Image(systemName: "qrcode.viewfinder")
+                        Text("QR")
+                    }
+                    .tag(2)
+                    
+                    ActividadPicker()
+                        .tabItem {
+                            Image(systemName: "questionmark")
+                            Text("Sorprendeme")
+                        }
+                        .tag(3)
+                    
+                    Perfil()
+                        .tabItem {
+                            Image(systemName: "person.circle.fill")
+                            Text("Perfil")
+                        }
+                        .tag(4)
+                }
+                .onChange(of: selectedIndex) { newValue in
+                    if newValue == 2 { // Detecta cuando se selecciona la pestaña de "QR"
+                        isPresentingScanner = true
+                        print("Se activó el escáner")
                     }
                 }
-            }
-
-            Spacer()
-            Divider()
-            HStack {
-                ForEach(0..<5, id:\.self) { number in
-                    Spacer()
-                    Button(action: {
-                        self.isPresentingScanner = true
-                    }, label: {
-                        if (icons[number] == "plus.app.fill") {
-                            Image(systemName: icons[number])
-                                .font(.system(size: 45, weight: .regular, design: .default))
-                                .foregroundColor(colorVerde)
-                        } else {
-                            Image(systemName: icons[number])
-                                .font(.system(size: 25, weight: .regular, design: .default))
-                                .foregroundColor(colorVerde)
-                        }
-                    })
-                    Spacer()
+                .sheet(isPresented: $isPresentingScanner) {
+                    self.scannerSheet
                 }
+                .tint(colorVerde)
             }
-            .sheet(isPresented: $isPresentingScanner) {
-                self.scannerSheet
-            }
+            .background(
+                NavigationLink(
+                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo))
+                        .navigationBarHidden(true),
+                    isActive: $navegarActividad
+                ) {
+                    EmptyView()
+                }
+            )
         }
-        .background(
-            NavigationLink(
-                destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo)),
-                isActive: $navegarActividad
-            ) {
-                EmptyView()
-            }
-        )
     }
 
+
     private func processScannedCode(_ code: String) {
-        // Verificar si el código QR coincide con el formato esperado para la actividad
         if code.starts(with: "actividad:") {
             let components = code.split(separator: ":")
             if let idString = components.last, let id = Int(idString) {
-                // Intentar obtener la actividad por ID usando el ActividadesViewModel
                 if let actividad = actividadModel.obtenerActividadPorId(id) {
                     self.actividadEncontrada = actividad
-                    self.navegarActividad = true // Activa la navegación
+                    self.navegarActividad = true
+                    print("Se activo navegar act")
                 } else {
-                    // Si no se encuentra la actividad, mostrar un error o hacer alguna otra acción
                     print("Actividad no encontrada")
                 }
             }
@@ -133,8 +167,9 @@ struct InicioOverhaul: View {
     }
 }
 
+
 #Preview {
-    InicioOverhaul(idZona: 2)  // Pasa el idZona correcto según el contexto
+    InicioOverhaul(idZona: 2)
+        .environmentObject(PerfilViewModel())
+    // Pasa el idZona correcto según el contexto
 }
-
-

@@ -23,7 +23,6 @@ struct SignIn: View {
     }
     
     var body: some View {
-        NavigationStack{
             ZStack {
                 Color.init(red: 193/255, green: 214/255, blue: 47/255).ignoresSafeArea()
                 
@@ -76,11 +75,9 @@ struct SignIn: View {
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("Aceptar")))
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $isAuthenticated) {
-                InicioView() // Navega a InicioView cuando isAuthenticated es true
+            .fullScreenCover(isPresented: $isAuthenticated) {
+                InicioOverhaul(idZona: 2) // Navega a InicioView cuando isAuthenticated es true
             }
-        }
     }
     
     private var loginView: some View {
