@@ -24,17 +24,30 @@ struct InicioOverhaul: View {
     }
 
     var scannerSheet: some View {
-        CodeScannerView(
-            codeTypes: [.qr],
-            completion: { result in
-                if case let .success(code) = result {
-                    self.scannedCode = code.string
-                    self.isPresentingScanner = false
-                    processScannedCode(code.string)
+        ZStack {
+            CodeScannerView(
+                codeTypes: [.qr],
+                completion: { result in
+                    if case let .success(code) = result {
+                        self.scannedCode = code.string
+                        self.isPresentingScanner = false
+                        processScannedCode(code.string)
+                    }
                 }
+            )
+            VStack {
+                Spacer()
+                Text("Apunta la cámara al código QR")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(10)
+                    .padding(.bottom, 50)
             }
-        )
+        }
     }
+
 
     var colorVerde = Color(red: 190 / 255.0, green: 214 / 255.0, blue: 0 / 255.0)
 
@@ -64,15 +77,43 @@ struct InicioOverhaul: View {
                         }
                         .tag(1)
                     
-                    // Esta pestaña no tiene una vista asociada
-                    Text("")
-                        .tabItem {
-                            Image(systemName: "qrcode.viewfinder")
-                            Text("QR")
+                    // Cambia el contenido de la pestaña QR
+                    VStack(spacing: 20) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .foregroundColor(colorVerde)
+                        
+                        Text("Escanea un código QR")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                        
+                        Text("Pulsa en el botón de escáner para activar la cámara y escanear un código QR.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                        
+                        // Botón para abrir la cámara
+                        Button(action: {
+                            isPresentingScanner = true
+                        }) {
+                            Text("Escanear")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(colorVerde)
+                                .cornerRadius(10)
                         }
-                        .tag(2)
+                    }
+                    .tabItem {
+                        Image(systemName: "qrcode.viewfinder")
+                        Text("QR")
+                    }
+                    .tag(2)
                     
-                    vistaEventos()
+                    ActividadPicker()
                         .tabItem {
                             Image(systemName: "questionmark")
                             Text("Sorprendeme")
@@ -89,7 +130,7 @@ struct InicioOverhaul: View {
                 .onChange(of: selectedIndex) { newValue in
                     if newValue == 2 { // Detecta cuando se selecciona la pestaña de "QR"
                         isPresentingScanner = true
-                        print("Se activo el escanner")
+                        print("Se activó el escáner")
                     }
                 }
                 .sheet(isPresented: $isPresentingScanner) {
@@ -108,6 +149,7 @@ struct InicioOverhaul: View {
             )
         }
     }
+
 
     private func processScannedCode(_ code: String) {
         if code.starts(with: "actividad:") {
@@ -131,5 +173,3 @@ struct InicioOverhaul: View {
         .environmentObject(PerfilViewModel())
     // Pasa el idZona correcto según el contexto
 }
-
-
