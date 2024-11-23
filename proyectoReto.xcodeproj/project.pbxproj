@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43009E672CF1A5F40082E46D /* ActividadPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43009E662CF1A5F40082E46D /* ActividadPicker.swift */; };
 		4323CB2E2CC0F09A00857933 /* ListaActividades.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323CB2D2CC0F09A00857933 /* ListaActividades.swift */; };
 		4323CB302CC0F0AA00857933 /* TemplateActividad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323CB2F2CC0F0AA00857933 /* TemplateActividad.swift */; };
 		4323CB322CC0F0B800857933 /* Actividad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323CB312CC0F0B800857933 /* Actividad.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		43009E662CF1A5F40082E46D /* ActividadPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActividadPicker.swift; sourceTree = "<group>"; };
 		4323CB2D2CC0F09A00857933 /* ListaActividades.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListaActividades.swift; sourceTree = "<group>"; };
 		4323CB2F2CC0F0AA00857933 /* TemplateActividad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateActividad.swift; sourceTree = "<group>"; };
 		4323CB312CC0F0B800857933 /* Actividad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actividad.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				94EB9A432CE2973E00B3AE7D /* Perfil.swift */,
 				94EB9A452CE2974200B3AE7D /* vistaEventos.swift */,
 				EB19D2712CEE963E00822450 /* eventUtils.swift */,
+				43009E662CF1A5F40082E46D /* ActividadPicker.swift */,
 				94EB9A472CE2974500B3AE7D /* vistaNoticias.swift */,
 				94EB9A492CE2974900B3AE7D /* WebView.swift */,
 			);
@@ -285,6 +288,7 @@
 				EBA7942E2CEC2786007D9576 /* HomePage.swift in Sources */,
 				4323CB2E2CC0F09A00857933 /* ListaActividades.swift in Sources */,
 				433860F02CBF5E3F00EAC170 /* ZonaDetallada.swift in Sources */,
+				43009E672CF1A5F40082E46D /* ActividadPicker.swift in Sources */,
 				433860F12CBF5E3F00EAC170 /* Utils.swift in Sources */,
 				94EB9A4C2CE2975000B3AE7D /* selectorFotos.swift in Sources */,
 				A47D213D2CBCB8B700BCD187 /* appState.swift in Sources */,

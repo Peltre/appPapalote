@@ -72,7 +72,7 @@ struct InicioOverhaul: View {
                         }
                         .tag(2)
                     
-                    vistaEventos()
+                    ActividadPicker()
                         .tabItem {
                             Image(systemName: "questionmark")
                             Text("Sorprendeme")
