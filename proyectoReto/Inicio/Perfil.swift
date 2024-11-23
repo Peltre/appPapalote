@@ -154,6 +154,12 @@
                                         ForEach(Array(fotos.enumerated()), id: \.0) { index, imageName in
                                             Button{
                                                 perfilViewModel.fotoPerfil = index
+                                                perfilViewModel.actualizarUsuario { success in
+                                                    if success {
+                                                    
+                                                        print("Foto actualizada papu")
+                                                    }
+                                                }
                                                 withAnimation {
                                                     isEditing = false
                                                 }
@@ -285,6 +291,39 @@
             }
         }
         
+        func guardarUsuarioLocalmente() {
+            // Obtener la URL del archivo
+            guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json") else {
+                print("Error: No se pudo obtener la URL del archivo de sesión")
+                return
+            }
+            
+            // Intentar cargar los datos existentes
+            var usuarioActualizado: user
+            do {
+                let data = try Data(contentsOf: fileURL)
+                usuarioActualizado = try JSONDecoder().decode(user.self, from: data)
+                
+                // Actualizar solo las propiedades necesarias
+                usuarioActualizado.username = nombreUsuario
+                usuarioActualizado.pfp = fotoPerfil + 1 // Actualiza según corresponda
+            } catch {
+                print("No se pudieron cargar los datos existentes o archivo no encontrado. Se creará un nuevo usuario.")
+                // Si no hay datos existentes, crear un nuevo usuario con valores por defecto
+                usuarioActualizado = user(idUsuario: 1, username: nombreUsuario, correo: "hola@gmail.com", pfp: fotoPerfil + 1) // Ajusta los valores predeterminados
+            }
+            
+            // Guardar los datos actualizados
+            do {
+                let updatedData = try JSONEncoder().encode(usuarioActualizado)
+                try updatedData.write(to: fileURL)
+                print("Usuario actualizado guardado localmente.")
+            } catch {
+                print("Error al guardar los datos localmente: \(error)")
+            }
+        }
+
+        
         func actualizarUsuario(completition: @escaping (Bool) -> Void) {
             guard let url = URL(string: "https://r1aguilar.pythonanywhere.com/modificar_usuario") else {
                 print("URL Inválida")
@@ -335,6 +374,9 @@
                 
                 if httpResponse.statusCode == 200 {
                     print("Datos actualizados correctamente")
+                    DispatchQueue.main.async {
+                        self.guardarUsuarioLocalmente()
+                    }
                     completition(true)
                 } else {
                     print("Error del servidor: \(httpResponse.statusCode)")
@@ -345,6 +387,7 @@
                 }
             }.resume()
         }
+
 }
 
 
