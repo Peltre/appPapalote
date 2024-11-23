@@ -64,6 +64,7 @@ struct HomePage: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .onAppear {
                     perfilViewModel.cargarUsername()
+                    perfilViewModel.cargarFoto()
                 }
                 
             }
