@@ -63,6 +63,12 @@
                                         return
                                     }
                                     
+                                    if perfilViewModel.nombreUsuario.count < 2 {
+                                        alertMessage = "El nombre tiene que tener al menos 2 caracteres."
+                                        showAlert = true
+                                        return
+                                    }
+                                    
                                     perfilViewModel.actualizarUsuario { success in
                                         if success {
                                             print("Nombre actualizado papu")
