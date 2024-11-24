@@ -38,6 +38,10 @@
 		A47D21302CBB2E5000BCD187 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A47D212F2CBB2E5000BCD187 /* Preview Assets.xcassets */; };
 		A47D213B2CBCB76F00BCD187 /* vistaInicio.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47D213A2CBCB76F00BCD187 /* vistaInicio.swift */; };
 		A47D213D2CBCB8B700BCD187 /* appState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47D213C2CBCB8B700BCD187 /* appState.swift */; };
+		C13DC7222CF294510006987B /* ActividadPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13DC7212CF294510006987B /* ActividadPicker.swift */; };
+		C13DC7242CF294570006987B /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13DC7232CF294570006987B /* HomePage.swift */; };
+		C13DC7262CF295230006987B /* eventUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13DC7252CF295230006987B /* eventUtils.swift */; };
+		C13DC7292CF295E90006987B /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = C13DC7282CF295E90006987B /* CodeScanner */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,10 +76,14 @@
 		A47D212F2CBB2E5000BCD187 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A47D213A2CBCB76F00BCD187 /* vistaInicio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vistaInicio.swift; sourceTree = "<group>"; };
 		A47D213C2CBCB8B700BCD187 /* appState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = appState.swift; sourceTree = "<group>"; };
+		C13DC7212CF294510006987B /* ActividadPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActividadPicker.swift; sourceTree = "<group>"; };
+		C13DC7232CF294570006987B /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
+		C13DC7252CF295230006987B /* eventUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = eventUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9407AE7C2CD01BB000036567 /* Sign in */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Sign in"; sourceTree = "<group>"; };
+		C1E83CBE2CF06A3A00C9A66A /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
 		FB04F2B92CC3339C00AEFCBB /* Tarjetas */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Tarjetas; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -84,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C13DC7292CF295E90006987B /* CodeScanner in Frameworks */,
 				433860F52CBF5FBD00EAC170 /* InteractiveMap in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,14 +113,16 @@
 		433860E82CBF5E1300EAC170 /* Inicio */ = {
 			isa = PBXGroup;
 			children = (
+				C13DC7212CF294510006987B /* ActividadPicker.swift */,
+				C13DC7232CF294570006987B /* HomePage.swift */,
 				A47D213A2CBCB76F00BCD187 /* vistaInicio.swift */,
 				94EB9A412CE2971A00B3AE7D /* InicioOverhaul.swift */,
-				A47D21282CBB2E4E00BCD187 /* proyectoRetoApp.swift */,
 				A47D212A2CBB2E4E00BCD187 /* ContentView.swift */,
 				A47D213C2CBCB8B700BCD187 /* appState.swift */,
 				9407AE852CD01C7500036567 /* ZoneManager.swift */,
 				94EB9A432CE2973E00B3AE7D /* Perfil.swift */,
 				94EB9A452CE2974200B3AE7D /* vistaEventos.swift */,
+				C13DC7252CF295230006987B /* eventUtils.swift */,
 				94EB9A472CE2974500B3AE7D /* vistaNoticias.swift */,
 				94EB9A492CE2974900B3AE7D /* WebView.swift */,
 			);
@@ -123,7 +134,6 @@
 			children = (
 				433860EA2CBF5E3400EAC170 /* ContentViewMapas.swift */,
 				433860EB2CBF5E3400EAC170 /* Piso2View.swift */,
-				433860EE2CBF5E3F00EAC170 /* Utils.swift */,
 				433860EF2CBF5E3F00EAC170 /* ZonaDetallada.swift */,
 				943181252CC82FD4004DD50E /* MapaDetalladoZona.swift */,
 				94EB9A4B2CE2975000B3AE7D /* selectorFotos.swift */,
@@ -166,6 +176,9 @@
 		A47D21272CBB2E4E00BCD187 /* proyectoReto */ = {
 			isa = PBXGroup;
 			children = (
+				A47D21282CBB2E4E00BCD187 /* proyectoRetoApp.swift */,
+				433860EE2CBF5E3F00EAC170 /* Utils.swift */,
+				C1E83CBE2CF06A3A00C9A66A /* Models */,
 				9407AE7C2CD01BB000036567 /* Sign in */,
 				FB04F2B92CC3339C00AEFCBB /* Tarjetas */,
 				433860E82CBF5E1300EAC170 /* Inicio */,
@@ -203,6 +216,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				9407AE7C2CD01BB000036567 /* Sign in */,
+				C1E83CBE2CF06A3A00C9A66A /* Models */,
 				FB04F2B92CC3339C00AEFCBB /* Tarjetas */,
 			);
 			name = proyectoReto;
@@ -236,6 +250,7 @@
 			mainGroup = A47D211C2CBB2E4E00BCD187;
 			packageReferences = (
 				433860F32CBF5FBD00EAC170 /* XCRemoteSwiftPackageReference "InteractiveMap" */,
+				C13DC7272CF295E90006987B /* XCRemoteSwiftPackageReference "CodeScanner" */,
 			);
 			productRefGroup = A47D21262CBB2E4E00BCD187 /* Products */;
 			projectDirPath = "";
@@ -271,6 +286,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C13DC7262CF295230006987B /* eventUtils.swift in Sources */,
 				433860EC2CBF5E3400EAC170 /* Piso2View.swift in Sources */,
 				433860ED2CBF5E3400EAC170 /* ContentViewMapas.swift in Sources */,
 				4323CB322CC0F0B800857933 /* Actividad.swift in Sources */,
@@ -280,9 +296,11 @@
 				433860F02CBF5E3F00EAC170 /* ZonaDetallada.swift in Sources */,
 				433860F12CBF5E3F00EAC170 /* Utils.swift in Sources */,
 				94EB9A4C2CE2975000B3AE7D /* selectorFotos.swift in Sources */,
+				C13DC7242CF294570006987B /* HomePage.swift in Sources */,
 				A47D213D2CBCB8B700BCD187 /* appState.swift in Sources */,
 				94EB9A4A2CE2974900B3AE7D /* WebView.swift in Sources */,
 				943181262CC82FD4004DD50E /* MapaDetalladoZona.swift in Sources */,
+				C13DC7222CF294510006987B /* ActividadPicker.swift in Sources */,
 				94EB9A462CE2974200B3AE7D /* vistaEventos.swift in Sources */,
 				4323CB302CC0F0AA00857933 /* TemplateActividad.swift in Sources */,
 				A47D213B2CBCB76F00BCD187 /* vistaInicio.swift in Sources */,
@@ -501,6 +519,14 @@
 				kind = branch;
 			};
 		};
+		C13DC7272CF295E90006987B /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -508,6 +534,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 433860F32CBF5FBD00EAC170 /* XCRemoteSwiftPackageReference "InteractiveMap" */;
 			productName = InteractiveMap;
+		};
+		C13DC7282CF295E90006987B /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C13DC7272CF295E90006987B /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

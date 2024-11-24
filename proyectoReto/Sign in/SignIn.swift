@@ -286,9 +286,12 @@ struct SignIn: View {
                 guardarUsuario(usuario: usuario)
                 usuarioGlobal = usuario
 //                verificarActividadesCompletadas()
-                obtenerActividadesCompletadas(idUsuario: usuario.idUsuario) { completadas in
+                actualizarUsuarioDB(usuario: usuario)
+                obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
                     actividadesCompletadas = completadas
                 }
+                obtenerInsignias()
+                fetchInsigniasCompletadas(idUsuario: usuario.idUsuario)
                 DispatchQueue.main.async {
                     self.isAuthenticated = true
                 }

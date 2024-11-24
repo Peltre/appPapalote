@@ -24,7 +24,7 @@ struct ScrollableCardStack<Data, Content>: View where Data: RandomAccessCollecti
                                 .visualEffect { content, geometryProxy in
                                     content
                                         .scaleEffect(scale(geometryProxy, scale: 0.05), anchor: .trailing)
-                                        .rotationEffect(rotation(geometryProxy, rotation: 4))
+                                        .rotationEffect(rotation(geometryProxy, rotation: 1))
                                         .offset(x: minX(geometryProxy))
                                         .offset(x: excessMinX(geometryProxy, offset: 5)) // lo que sobre sale
                                 }
@@ -103,37 +103,21 @@ struct DemoView: View {
             DemoItem(name: "Purple", color: .purple)
         ]
         
-        VStack {
-            Text("Scrollable Card Stack SwiftUI")
-                .font(.largeTitle.bold())
-                .multilineTextAlignment(.center)
-            Text("Scrollable, RTL Support")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            
-            Spacer()
-            
-            ScrollableCardStack(data: colors) { namedColor in
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(namedColor.color)
-                    .overlay(
-                        Text(namedColor.name)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                    )
-                    .frame(width: 270)
-                    .onTapGesture {
-                        print("Click: \(namedColor.name)")
-                    }
-            }
-            .background(.blue)
-            
-            Spacer()
-            
-            Text("bento.me/codelab")
-                .foregroundStyle(.blue)
+        ScrollableCardStack(data: colors) { namedColor in
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(namedColor.color)
+                .overlay(
+                    Text(namedColor.name)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                )
+                .frame(width: 270)
+                .onTapGesture {
+                    print("Click: \(namedColor.name)")
+                }
         }
+        .background(.blue)
     }
 }
 // Preview for DemoView

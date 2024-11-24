@@ -28,53 +28,19 @@ struct ZonaDetallada: View, Identifiable {
                 colores[idZona]!
                     .ignoresSafeArea()
                 
-                RoundedRectangle(cornerSize: CGSize(width: 30, height: 30))
-                    .fill(.thinMaterial)
-                    .frame(width: UIScreen.screenWidth*0.9, height: 620)
+                Rectangle()
+                    .fill(.thinMaterial).opacity(0.6)
+                    .frame(width: UIScreen.screenWidth, height: 200)
+                    .offset(y: -UIScreen.screenHeight/2 + 16)
+                    .shadow(radius: 10)
                 
-                VStack {
-                    // Back button and title
-                    ZStack {
-                        
-                        Button(action: {
-                            dismiss()
-                        }) {
-                            Image(systemName: "arrow.left")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 25)
-                                .foregroundColor(.black)
-                                .padding(10)
-                                .background(Color(white: 1))
-                                .clipShape(Circle())
-                                .shadow(radius: 3, y: 2)
-                        }
-                        .offset(x: -UIScreen.screenWidth / 2 + 35)
-                        
-                        Text(pathDictionary[TituloZona]?.1 ?? "Rara")
-                            .font(.system(size: 35))
-                            .bold()
-                    }
-                    
-                    Spacer()
-                    
-                    NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
-                        enfocarActividadNombre = selectedNombre
-                        print("Zona \(String(describing: enfocarActividadNombre))")
-                    }, idZona: idZona)) {
-                        Text("Mapa Detallado")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(width: 300, height: 60)
-                            .background(colores[idZona] ?? Color.gray)
-                            .cornerRadius(30)
-                            .shadow(radius: 4)
-                    }
-                }
-                .navigationBarBackButtonHidden(true)
-                .frame(width: UIScreen.screenWidth)
-                .background(.thinMaterial.opacity(0.3))
+                Rectangle()
+                    .fill(.thinMaterial).opacity(0.6)
+                    .frame(width: UIScreen.screenWidth, height: UIScreen.screenHeight/5)
+                    .offset(y: UIScreen.screenHeight/2.23)
+                    .shadow(radius: 10, y: -5)
+                
+                
                 
                 ScrollViewReader { scrollProxy in
                     ScrollableCardStack(data: actividadModel.actividadesFiltradas) { actividad in
@@ -104,8 +70,9 @@ struct ZonaDetallada: View, Identifiable {
                                         .foregroundColor(.white)
                                 }
                             }
-                            .frame(width: UIScreen.screenWidth * 0.85, height: UIScreen.screenHeight * 0.6) // Flexible width, fixed height
+                            .frame(width: UIScreen.screenWidth)
                             .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .scaleEffect(0.85)
                         }
                         .id(actividad.idActividad) // Assign an ID based on activity
                     }
@@ -115,6 +82,47 @@ struct ZonaDetallada: View, Identifiable {
                         }
                     }
                 }
+                .ignoresSafeArea()
+                
+                ZStack {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "arrow.left")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 25)
+                            .foregroundColor(.black)
+                            .padding(10)
+                            .background(Color(white: 1))
+                            .clipShape(Circle())
+                            .shadow(radius: 3, y: 2)
+                    }
+                    .offset(x: -UIScreen.screenWidth / 2 + 35)
+                    
+                    Text(pathDictionary[TituloZona]?.1 ?? "Rara")
+                        .font(.system(size: 35))
+                        .bold()
+                }
+                .padding(.bottom, UIScreen.screenHeight/1.2)
+                
+                NavigationLink(destination: MapaDetalladoZona(onSelectPath: { selectedNombre in
+                    enfocarActividadNombre = selectedNombre
+                    print("Zona \(String(describing: enfocarActividadNombre))")
+                }, idZona: idZona)) {
+                    Text("Mapa Detallado")
+                        .font(.system(size: 20))
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 300, height: 60)
+                        .background(.ultraThinMaterial).opacity(0.7)
+                        .cornerRadius(30)
+                        .shadow(radius: 5, y: 3)
+                }
+                .padding(.top, UIScreen.screenHeight/1.2)
+                
+                .navigationBarBackButtonHidden(true)
             }
         }
     }
