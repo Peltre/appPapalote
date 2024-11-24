@@ -9,7 +9,7 @@
         @State private var isView: Bool = false // Para la vista de insignias
         @State private var editingName: Bool = false // Para la edición del nombre
         
-        private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "tlacuache", "oso", "oso"]
+        private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
         
         var body: some View {
             NavigationStack {
