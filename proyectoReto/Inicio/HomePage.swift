@@ -27,7 +27,7 @@ struct HomePage: View {
     
     @EnvironmentObject var perfilViewModel: PerfilViewModel
     
-    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "tlacuache", "oso", "oso"]
+    private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
 
     
     var body: some View {

@@ -8,8 +8,11 @@
         @State private var isEditing: Bool = false // Para la edición de la foto
         @State private var isView: Bool = false // Para la vista de insignias
         @State private var editingName: Bool = false // Para la edición del nombre
+        @State private var alertMessage: String = ""
+        @State private var showAlert: Bool = false // Estado para mostrar alerta
+
         
-        private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "tlacuache", "oso", "oso"]
+        private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
         
         var body: some View {
             NavigationStack {
@@ -44,7 +47,7 @@
                                 })
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .frame(maxWidth: 200)
-                                // add call to endpoint to change username
+                    // add call to endpoint to change username
                             } else {
                                 Text(perfilViewModel.nombreUsuario)
                                     .font(.largeTitle)
@@ -53,13 +56,27 @@
                             
                             Button {
                                 if editingName == true {
+                                    
+                                    if perfilViewModel.nombreUsuario.count > 10 {
+                                        alertMessage = "El nombre no puede tener más de 10 caracteres."
+                                        showAlert = true
+                                        return
+                                    }
+                                    
+                                    if perfilViewModel.nombreUsuario.count < 2 {
+                                        alertMessage = "El nombre tiene que tener al menos 2 caracteres."
+                                        showAlert = true
+                                        return
+                                    }
+                                    
                                     perfilViewModel.actualizarUsuario { success in
                                         if success {
-                                        
                                             print("Nombre actualizado papu")
                                         }
                                     }
                                 }
+                                
+                                
                                 
                                 withAnimation {
                                     editingName.toggle()
@@ -130,6 +147,11 @@
                 .onAppear {
                     perfilViewModel.cargarUsuario()
                 }
+                
+                .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                }
+
                 
                 // Overlay de edición de la foto o vista de insignias
                 .overlay(
@@ -291,6 +313,7 @@
             }
         }
         
+
         func cargarFoto() {
             guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json") else {
                 print("Error: No se pudo obtener la URL del archivo de sesión")
@@ -427,3 +450,5 @@
             print("Error al intentar limpiar el archivo de sesión: \(error.localizedDescription)")
         }
     }
+
+
