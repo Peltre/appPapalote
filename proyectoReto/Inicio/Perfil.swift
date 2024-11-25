@@ -9,8 +9,10 @@ struct Perfil: View {
     @State private var isEditing: Bool = false // Para la edición de la foto
     @State private var isView: Bool = false // Para la vista de insignias
     @State private var editingName: Bool = false // Para la edición del nombre
+    @State private var alertMessage: String = ""
+    @State private var showAlert: Bool = false // Estado para mostrar alerta
     
-    private let fotos = ["oso", "mariposa 1", "pinguino", "tlacuache", "tlacuache", "oso", "oso"]
+    private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
     
     var body: some View {
         NavigationStack {
@@ -53,14 +55,26 @@ struct Perfil: View {
                         }
                         
                         Button {
-                            if editingName == true {
-                                perfilViewModel.actualizarUsuario { success in
-                                    if success {
+                                if editingName == true {
                                     
-                                        print("Nombre actualizado papu")
+                                    if perfilViewModel.nombreUsuario.count > 10 {
+                                        alertMessage = "El nombre no puede tener más de 10 caracteres."
+                                        showAlert = true
+                                        return
+                                    }
+                                    
+                                    if perfilViewModel.nombreUsuario.count < 2 {
+                                        alertMessage = "El nombre tiene que tener al menos 2 caracteres."
+                                        showAlert = true
+                                        return
+                                    }
+                                    
+                                    perfilViewModel.actualizarUsuario { success in
+                                        if success {
+                                            print("Nombre actualizado papu")
+                                        }
                                     }
                                 }
-                            }
                             
                             withAnimation {
                                 editingName.toggle()
@@ -159,6 +173,9 @@ struct Perfil: View {
             }
             .onAppear {
                 perfilViewModel.cargarUsuario()
+            }
+            .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
             }
             
             // Overlay de edición de la foto o vista de insignias
