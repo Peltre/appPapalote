@@ -132,18 +132,31 @@ struct TemplateActividad2: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.white.opacity(0.7))
-                        .frame(minWidth: cardWidth)
+                        .frame(minWidth: cardWidth, minHeight: 180) // Altura mínima asegurada
                         .shadow(color: Color(white: 0.96), radius: 2)
-                    Text(tarjeta.texto ?? "")
-                        .font(.headline)
-                        .padding()
+                    
+                    VStack(spacing: 20) {
+                        Spacer()
+                        Text(question?.titulo ?? "")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                        
+                        Text(question?.texto ?? "")
+                            .font(.body)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .fixedSize(horizontal: false, vertical: true) // Esto asegura que se muestre todo el texto
+                        Spacer()
+                    }
+                    .padding()
                 }
-                .frame(width: cardWidth)
+                    .frame(width: cardWidth)
             )
         case 2, 3:
             if let question = question {
                 return AnyView(
-                    SlidingOverlayCardView(question: question)
+                    SlidingOverlayCardView(question: question, imageUrl: tarjeta.imagenUrl)
                         .frame(width: cardWidth, height: cardWidth)
                 )
             } else {
@@ -182,6 +195,10 @@ struct TemplateActividad2: View {
                 }
                 .frame(width: cardWidth, height: cardWidth)
                 .padding(.vertical, 20)
+            )
+        case 5:
+            return AnyView(
+                QuizCardView(question: question, cardWidth: cardWidth)
             )
         default:
             return AnyView(EmptyView())
@@ -291,48 +308,109 @@ struct PopupInsigniasView: View {
     TemplateActividad2(unaActividad: Actividad2(idActividad: 3, idZona: 2, nombre: "PEPE", listaTarjetas: Tarjeta.datosEjemplo, completar: 1), qrFlag: true)
 }
 
-//#Preview {
-//    struct PreviewWrapper: View {
-//        @State var showPopup: Bool = true
-//        
-//        let sampleInsignias: [Insignia] = [
-//            Insignia(
-//                InsigniaId: 1,
-//                ImagenLink: "https://cdn-icons-png.flaticon.com/512/411/411728.png",
-//                Nombre: "Insignia Explorador",
-//                Descripcion: "Otorgada por explorar nuevas áreas",
-//                Valor: 100
-//            ),
-//            Insignia(
-//                InsigniaId: 2,
-//                ImagenLink: "https://cdn-icons-png.flaticon.com/512/411/411728.png",
-//                Nombre: "Insignia Aventurero",
-//                Descripcion: "Completar 5 actividades",
-//                Valor: 200
-//            ),
-//            Insignia(
-//                InsigniaId: 3,
-//                ImagenLink: "https://cdn-icons-png.flaticon.com/512/411/411728.png",
-//                Nombre: "Insignia Experto",
-//                Descripcion: "Dominar todas las zonas",
-//                Valor: 300
-//            ),
-//            Insignia(
-//                InsigniaId: 4,
-//                ImagenLink: "https://cdn-icons-png.flaticon.com/512/411/411728.png",
-//                Nombre: "Insignia Maestro",
-//                Descripcion: "Dominar todas las zonas",
-//                Valor: 300
-//            )
-//        ]
-//        
-//        var body: some View {
-//            ZStack {
-//                Color.gray.opacity(0.3) // Background to show the popup better
-//                PopupInsigniasView(showPopup: $showPopup, nuevasInsignias: sampleInsignias)
-//            }
-//        }
-//    }
-//    
-//    return PreviewWrapper()
-//}
+struct QuizCardView: View {
+    let question: Question?
+    let cardWidth: CGFloat
+    @State private var selectedAnswer: Int?
+    
+    private func verifyAnswer(buttonNumber: Int) -> Bool {
+        if let correctString = question?.correcta {
+            let expectedAnswer = "respuesta\(buttonNumber)"
+            return correctString == expectedAnswer
+        }
+        return false
+    }
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.7))
+                .frame(minWidth: cardWidth, minHeight: 300)
+                .shadow(color: Color(white: 0.96), radius: 2)
+            
+            VStack(spacing: 20) {
+                Text(question?.titulo ?? "")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                Text(question?.texto ?? "")
+                    .font(.body)
+                    .foregroundColor(.black)
+                    .padding(.horizontal)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                VStack(spacing: 15) {
+                    HStack(spacing: 15) {
+                        QuizButton(
+                            text: question?.respuesta1 ?? "",
+                            isSelected: selectedAnswer == 1,
+                            isCorrect: selectedAnswer == 1 ? verifyAnswer(buttonNumber: 1) : false,
+                            action: { selectedAnswer = 1 }
+                        )
+                        
+                        QuizButton(
+                            text: question?.respuesta2 ?? "",
+                            isSelected: selectedAnswer == 2,
+                            isCorrect: selectedAnswer == 2 ? verifyAnswer(buttonNumber: 2) : false,
+                            action: { selectedAnswer = 2 }
+                        )
+                    }
+                    
+                    HStack(spacing: 15) {
+                        QuizButton(
+                            text: question?.respuesta3 ?? "",
+                            isSelected: selectedAnswer == 3,
+                            isCorrect: selectedAnswer == 3 ? verifyAnswer(buttonNumber: 3) : false,
+                            action: { selectedAnswer = 3 }
+                        )
+                        
+                        QuizButton(
+                            text: question?.respuesta4 ?? "",
+                            isSelected: selectedAnswer == 4,
+                            isCorrect: selectedAnswer == 4 ? verifyAnswer(buttonNumber: 4) : false,
+                            action: { selectedAnswer = 4 }
+                        )
+                    }
+                }
+                .padding()
+            }
+            .padding()
+        }
+        .frame(width: cardWidth)
+    }
+}
+
+struct QuizButton: View {
+    let text: String
+    let isSelected: Bool
+    let isCorrect: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(text)
+                .font(.body)
+                .foregroundColor(.black)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(.ultraThinMaterial)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(
+                            isSelected ?
+                                (isCorrect ? Color.green : Color.red) :
+                                Color.clear,
+                            lineWidth: isSelected ? 3 : 0
+                        )
+                        .shadow(
+                            color: isSelected ?
+                                (isCorrect ? Color.green : Color.red) :
+                                Color.clear,
+                            radius: 5
+                        )
+                )
+        }
+    }
+}
