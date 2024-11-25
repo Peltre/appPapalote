@@ -1,22 +1,18 @@
 //
-//  vistaEventos.swift
-//  proyectoReto
+// vistaEventos.swift
+// proyectoReto
 //
-//  Created by Pedr1p on 05/11/24.
+// Created by Pedr1p on 05/11/24.
 //
 
 import SwiftUI
 
-
 struct vistaEventos: View {
-    
     @StateObject private var service = EventosService()
-    
+    @Environment(\.presentationMode) var presentationMode // Ambiente para controlar la navegación
+
     var body: some View {
         VStack {
-            Text("Eventos")
-                .font(.largeTitle)
-                .bold()
             Form {
                 ForEach(service.eventos) { evento in
                     Section {
@@ -28,7 +24,7 @@ struct vistaEventos: View {
                             Text("Fecha de inicio: \(evento.FechaInicio)")
                                 .font(.footnote)
                                 .foregroundStyle(.gray)
-                            Text("Fecha de Finalizacion: \(evento.FechaFinal)")
+                            Text("Fecha de Finalización: \(evento.FechaFinal)")
                                 .font(.footnote)
                                 .foregroundStyle(.gray)
                             
@@ -51,7 +47,6 @@ struct vistaEventos: View {
                         }
                         .padding(.vertical, 10)
                     }
-                    
                 }
             }
             .onAppear {
@@ -59,10 +54,26 @@ struct vistaEventos: View {
             }
         }
         .padding()
+        .navigationBarTitle("Eventos", displayMode: .inline)
+        .navigationBarBackButtonHidden(true) // Esconde el botón de retroceso predeterminado
+        .navigationBarItems(leading: Button(action: {
+            presentationMode.wrappedValue.dismiss() // Cierra la vista y regresa
+        }) {
+            Image(systemName: "arrow.left")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 25)
+                .foregroundColor(.black)
+                .padding(10)
+                .background(Color(white: 1))
+                .clipShape(Circle())
+                .shadow(radius: 3, y: 2)
+                .foregroundColor(.blue)
+        })
     }
 }
-
 
 #Preview {
     vistaEventos()
 }
+
