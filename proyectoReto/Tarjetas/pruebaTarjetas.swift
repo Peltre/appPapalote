@@ -6,7 +6,7 @@ struct SlidingOverlayCardView: View {
     @State private var isDragging = false // Track dragging state
     private let cornerRadius: CGFloat = 30
     var question: Question
-    var imageUrl : String?
+    var imageUrl: String?
     
     var body: some View {
         GeometryReader { geometry in
@@ -44,7 +44,7 @@ struct SlidingOverlayCardView: View {
                         .clipped()
                 }
                 
-                // Sliding overlay content with reversed arrow positions
+                // Sliding overlay content
                 ZStack {
                     OverlayView(question: question)
                         .frame(width: frameWidth, height: frameHeight)
@@ -133,9 +133,10 @@ struct OverlayView: View {
             Text(question.texto)
                 .font(.body)
                 .foregroundColor(.black)
-                .padding(.horizontal)
-            
-            .padding(.top)
+                .padding(.horizontal, 40) // Espaciado interno del texto, no afecta el diseño externo
+                .padding(.top)
         }
     }
 }
+
+
