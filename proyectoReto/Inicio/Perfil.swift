@@ -12,6 +12,9 @@ struct Perfil: View {
     @State private var alertMessage: String = ""
     @State private var showAlert: Bool = false // Estado para mostrar alerta
     @State var insigniasSetLocal : Set<Int> = Set<Int>()
+    @State private var mostrarSheet = false
+    @State private var insigniaSeleccionada: Insignia? = nil
+
     
     private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
     
@@ -142,10 +145,32 @@ struct Perfil: View {
                                             .multilineTextAlignment(.center)
                                     }
                                     .padding()
+                                    .onTapGesture {
+                                        insigniaSeleccionada = insignia  // Asignar la insignia seleccionada
+                                        mostrarSheet.toggle()           // Mostrar la sheet
+                                    }                               
                                 }
                             }
                         }
                     }
+                }
+                .sheet(isPresented: $mostrarSheet) {
+                            if let insignia = insigniaSeleccionada {
+                                VStack {
+                                    Text(insignia.Nombre)
+                                        .font(.title)
+                                        .bold
+                                        .padding()
+                                    Text(insignia.Descripcion)
+                                        .font(.body)
+                                        .padding()
+                                    Button("Cerrar") {
+                                        mostrarSheet.toggle() // Cerrar la sheet
+                                    }
+                                    .padding()
+                                }
+                                .padding()
+                            }
                 }
                 .shadow(radius: 7)
                 .onAppear{
