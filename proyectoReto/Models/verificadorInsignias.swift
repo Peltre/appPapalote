@@ -103,6 +103,9 @@ class VerificadorInsignias {
             // Save the updated list back to the local JSON file
             do {
                 let jsonData = try JSONEncoder().encode(localInsigniasCompletadas)
+                if let jsonString = String(data: jsonData, encoding: .utf8) {
+                    print("Contenido del JSON a guardar:\n\(jsonString)")
+                }
                 try jsonData.write(to: localFileInsignias)
                 print("Insignias completadas actualizadas en el archivo local.")
             } catch {
