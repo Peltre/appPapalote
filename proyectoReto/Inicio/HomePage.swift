@@ -34,7 +34,6 @@ struct HomePage: View {
             NavigationView {
             
                 VStack {
-                    
                     Image(fotos[perfilViewModel.fotoPerfil])
                         .resizable()
                         .scaledToFit()
