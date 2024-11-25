@@ -607,7 +607,7 @@ func actualizarUsuarioDB(usuario: user, completion: @escaping (Bool) -> Void) {
     let datosActualizados: [String: Any] = [
         "id": usuario.idUsuario,
         "username": usuario.username,  // nuevo nombre de usuario
-        "pfp": usuario.pfp + 1        // pfp sin cambios
+        "pfp": usuario.pfp        // pfp sin cambios
     ]
     
     guard let jsonData = try? JSONSerialization.data(withJSONObject: datosActualizados) else {
