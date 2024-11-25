@@ -11,21 +11,6 @@ struct ContentViewMapas: View {
     
     var body: some View {
         NavigationStack {
-            Button(action: {
-                presentationMode.wrappedValue.dismiss() // Cierra la vista actual
-            }) {
-                Image(systemName: "arrow.left")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .font(.system(size: 20))
-                    .frame(width: 25)
-                    .foregroundColor(.black)
-                    .padding(10)
-                    .background(Color(white: 1))
-                    .clipShape(Circle())
-            }
-            .offset(x: -UIScreen.screenWidth / 2 + 35)
-            
             ZStack {
                 Color.clear
                     .contentShape(Rectangle())
