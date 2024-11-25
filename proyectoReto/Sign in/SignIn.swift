@@ -221,6 +221,7 @@ struct SignIn: View {
                 
                 Button {
                     print("Registrarse")
+                    registrarUsuario()
                 } label: {
                     Text("Regístrate")
                         .font(.title2)
@@ -271,6 +272,108 @@ struct SignIn: View {
             }
         }
     }
+    
+    private func registrarUsuario() {
+        isLoading = true // Comenzar la carga
+        
+        guard let url = URL(string: "\(apiURLbase)crear_usuario") else { return }
+        
+        // Crear el diccionario de datos de registro
+        // Crear los datos de registro como instancia de la estructura
+            let registro = RegistroUsuario(
+                username: username,
+                pfp: "1", // Perfil predeterminado como cadena de texto
+                correo: correo,
+                pass: password
+            )
+        
+        guard let jsonData = try? JSONEncoder().encode(registro) else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                self.isLoading = false // Detener la carga
+            }
+            
+            if let error = error {
+                DispatchQueue.main.async {
+                    self.alertMessage = "No se pudo registrar: \(error.localizedDescription)"
+                    self.showAlert = true
+                    self.correo = ""
+                    self.password = ""
+                    self.username = ""
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    self.alertMessage = "No se recibió datos de la respuesta."
+                    self.showAlert = true
+                    self.correo = ""
+                    self.password = ""
+                    self.username = ""
+                }
+                return
+            }
+            
+            if let usuario = try? JSONDecoder().decode(user.self, from: data) {
+                guardarUsuario(usuario: usuario)
+                usuarioGlobal = usuario
+                
+                // Grupo para manejar las operaciones asíncronas
+                let group = DispatchGroup()
+                
+                // Actualizar usuario en DB
+                group.enter()
+                actualizarUsuarioDB(usuario: usuario) { success in
+                    if !success {
+                        print("Error al actualizar usuario en DB")
+                    }
+                    group.leave()
+                }
+                
+                // Obtener actividades completadas
+                group.enter()
+                obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
+                    actividadesCompletadas = completadas
+                    group.leave()
+                }
+                
+                // Obtener insignias
+                obtenerInsignias()
+                
+                // Fetch insignias completadas
+                group.enter()
+                fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { success in
+                    if !success {
+                        print("Error al obtener insignias completadas")
+                    }
+                    group.leave()
+                }
+                
+                // Cuando todas las operaciones asíncronas terminen
+                group.notify(queue: .main) {
+                    self.isAuthenticated = true
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.alertMessage = "No se pudo registrar: datos inválidos."
+                    self.showAlert = true
+                    self.correo = ""
+                    self.password = ""
+                    self.username = ""
+                }
+            }
+        }
+        
+        task.resume()
+    }
+
     
     private func iniciarSesion() {
         isLoading = true // Comenzar la carga
