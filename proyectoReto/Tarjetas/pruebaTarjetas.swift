@@ -6,6 +6,7 @@ struct SlidingOverlayCardView: View {
     @State private var isDragging = false // Track dragging state
     private let cornerRadius: CGFloat = 30
     var question: Question
+    var imageUrl : String?
     
     var body: some View {
         GeometryReader { geometry in
@@ -13,12 +14,35 @@ struct SlidingOverlayCardView: View {
             let frameHeight = frameWidth * 0.9
             
             ZStack {
-                // Main image
-                Image("cat")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: frameWidth, height: frameHeight)
-                    .clipped()
+                if let url = URL(string: imageUrl!) {
+                    CacheAsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 100, height: 100)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: frameWidth, height: frameHeight)
+                                .clipped()
+                        case .failure:
+                            Image(systemName: "cat")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: frameWidth, height: frameHeight)
+                                .clipped()
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    Image("cat")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: frameWidth, height: frameHeight)
+                        .clipped()
+                }
                 
                 // Sliding overlay content with reversed arrow positions
                 ZStack {
@@ -111,12 +135,6 @@ struct OverlayView: View {
                 .foregroundColor(.black)
                 .padding(.horizontal)
             
-            VStack {
-                Text(question.respuesta1)
-                Text(question.respuesta2)
-                Text(question.respuesta3)
-                Text(question.respuesta4)
-            }
             .padding(.top)
         }
     }
