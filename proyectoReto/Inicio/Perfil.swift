@@ -69,11 +69,7 @@ struct Perfil: View {
                                         return
                                     }
                                     
-                                    perfilViewModel.actualizarUsuario { success in
-                                        if success {
-                                            print("Nombre actualizado papu")
-                                        }
-                                    }
+                                    perfilViewModel.guardarUsuarioLocalmente()
                                 }
                             
                             withAnimation {
@@ -415,6 +411,8 @@ func cargarUsuario() {
             let updatedData = try JSONEncoder().encode(usuarioActualizado)
             try updatedData.write(to: fileURL)
             print("Usuario actualizado guardado localmente.")
+            usuarioGlobal!.pfp = fotoPerfil + 1
+            usuarioGlobal!.username = nombreUsuario
         } catch {
             print("Error al guardar los datos localmente: \(error)")
         }
