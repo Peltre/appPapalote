@@ -1,4 +1,5 @@
 import SwiftUI
+import CryptoKit
 
 struct SignIn: View {
     @State private var username: String = ""
@@ -12,6 +13,7 @@ struct SignIn: View {
     @State private var isLoading: Bool = false // Nuevo estado para el progreso
     @State private var isAuthenticated: Bool = false // Nueva variable de autenticación
     @State private var isButtonVisible = true // Controla la visibilidad del botón
+    @State private var hashedPassword = ""
 
     
     @Environment(\.colorScheme) private var colorScheme
@@ -273,32 +275,42 @@ struct SignIn: View {
         }
     }
     
+    let fixedSalt = "fixed_salt"
+    
+    func hashPassword(password: String) -> String {
+        let combined = password + fixedSalt // Usa el fixedSalt en lugar de un salt generado aleatoriamente
+        guard let data = combined.data(using: .utf8) else { return "" }
+        let hashed = SHA256.hash(data: data)
+        return hashed.compactMap { String(format: "%02x", $0) }.joined()
+    }
+
+    
     private func registrarUsuario() {
         isLoading = true // Comenzar la carga
-        
+        hashedPassword = hashPassword(password: password) // Asegúrate de que 'password' es la contraseña proporcionada
+
         guard let url = URL(string: "\(apiURLbase)crear_usuario") else { return }
-        
-        // Crear el diccionario de datos de registro
+
         // Crear los datos de registro como instancia de la estructura
-            let registro = RegistroUsuario(
-                username: username,
-                pfp: "1", // Perfil predeterminado como cadena de texto
-                correo: correo,
-                pass: password
-            )
-        
+        let registro = RegistroUsuario(
+            username: username,
+            pfp: "1", // Perfil predeterminado como cadena de texto
+            correo: correo,
+            pass: hashedPassword // Usar el hashedPassword
+        )
+
         guard let jsonData = try? JSONEncoder().encode(registro) else { return }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonData
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 self.isLoading = false // Detener la carga
             }
-            
+
             if let error = error {
                 DispatchQueue.main.async {
                     self.alertMessage = "No se pudo registrar: \(error.localizedDescription)"
@@ -309,7 +321,7 @@ struct SignIn: View {
                 }
                 return
             }
-            
+
             guard let data = data else {
                 DispatchQueue.main.async {
                     self.alertMessage = "No se recibió datos de la respuesta."
@@ -320,14 +332,14 @@ struct SignIn: View {
                 }
                 return
             }
-            
+
             if let usuario = try? JSONDecoder().decode(user.self, from: data) {
                 guardarUsuario(usuario: usuario)
                 usuarioGlobal = usuario
-                
+
                 // Grupo para manejar las operaciones asíncronas
                 let group = DispatchGroup()
-                
+
                 // Actualizar usuario en DB
                 group.enter()
                 actualizarUsuarioDB(usuario: usuario) { success in
@@ -336,17 +348,17 @@ struct SignIn: View {
                     }
                     group.leave()
                 }
-                
+
                 // Obtener actividades completadas
                 group.enter()
                 obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
                     actividadesCompletadas = completadas
                     group.leave()
                 }
-                
+
                 // Obtener insignias
                 obtenerInsignias()
-                
+
                 // Fetch insignias completadas
                 group.enter()
                 fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { success in
@@ -355,7 +367,7 @@ struct SignIn: View {
                     }
                     group.leave()
                 }
-                
+
                 // Cuando todas las operaciones asíncronas terminen
                 group.notify(queue: .main) {
                     self.isAuthenticated = true
@@ -370,9 +382,10 @@ struct SignIn: View {
                 }
             }
         }
-        
+
         task.resume()
     }
+
 
     
     private func iniciarSesion() {
@@ -380,7 +393,9 @@ struct SignIn: View {
         
         guard let url = URL(string: "\(apiURLbase)login") else { return }
         
-        let loginData: [String: String] = ["correo": correo, "password": password]
+        hashedPassword = hashPassword(password: password) // Asegúrate de que 'password' es
+        
+        let loginData: [String: String] = ["correo": correo, "password": hashedPassword]
         guard let jsonData = try? JSONEncoder().encode(loginData) else { return }
         
         var request = URLRequest(url: url)
@@ -570,7 +585,7 @@ struct SignIn: View {
 //        let fileManager = FileManager.default
 //        let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
 //        let fileURL = documentsDirectory.appendingPathComponent("actividadesCompletadas.json")
-//        
+//
 //        if fileManager.fileExists(atPath: fileURL.path) {
 //            do {
 //                let data = try Data(contentsOf: fileURL)
