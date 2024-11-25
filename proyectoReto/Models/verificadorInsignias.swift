@@ -38,6 +38,7 @@ class VerificadorInsignias {
             do {
                 let data = try Data(contentsOf: localFileActividades)
                 actividadesCompletadasInterna = try JSONDecoder().decode([ActividadUsuario].self, from: data)
+                print("lista obtenida de actividadesCompletadas.json: \(actividadesCompletadasInterna)")
             } catch {
                 print("Error al leer o decodificar el archivo actividadesCompletadas.json: \(error)")
                 return nil
@@ -50,6 +51,7 @@ class VerificadorInsignias {
             do {
                 let data = try Data(contentsOf: localFileInsignias)
                 localInsigniasCompletadas = try JSONDecoder().decode([UserInsignia].self, from: data)
+                print("lista obtenida de actividadesCompletadas.json: \(localInsigniasCompletadas)")
             } catch {
                 print("Error al leer o decodificar el archivo insigniasCompletadas.json: \(error)")
                 return nil
@@ -79,6 +81,8 @@ class VerificadorInsignias {
                 insigniasCompletadasSet.insert(insignia.InsigniaId)
             }
             
+            print("Nuevo set de insignias interno \(insigniasCompletadasSet)")
+            
             // Create the current date string
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -93,6 +97,8 @@ class VerificadorInsignias {
                 )
                 localInsigniasCompletadas.append(nuevaInsigniaCompletada)
             }
+            
+            print("Lista para guardar en el JSON local de insignias completadas \(localInsigniasCompletadas)")
 
             // Save the updated list back to the local JSON file
             do {
