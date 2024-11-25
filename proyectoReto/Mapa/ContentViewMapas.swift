@@ -36,11 +36,15 @@ struct ContentViewMapas: View {
                 VStack {
                     Text(tituloPiso)
                         .font(.system(size: 40, weight: .black))
+
+                    // Ajuste para centrar y definir el tamaño del mapa
                     interactiveMapView(svgName: svgName)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // Asegura que el mapa ocupe todo el espacio disponible
+                        .aspectRatio(contentMode: .fit) // Mantiene las proporciones del mapa
                 }
-                .padding(.horizontal, 15)
-                .padding(.vertical, 157)
+                .padding() // Aplica un espaciado uniforme, elimina padding específico
                 .opacity(opacity)
+
             }
             .fullScreenCover(item: $selectedZona) { zonaDetallada in
                 zonaDetallada // Presenta la vista ZonaDetallada
