@@ -11,21 +11,6 @@ struct ContentViewMapas: View {
     
     var body: some View {
         NavigationStack {
-            Button(action: {
-                presentationMode.wrappedValue.dismiss() // Cierra la vista actual
-            }) {
-                Image(systemName: "arrow.left")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .font(.system(size: 20))
-                    .frame(width: 25)
-                    .foregroundColor(.black)
-                    .padding(10)
-                    .background(Color(white: 1))
-                    .clipShape(Circle())
-            }
-            .offset(x: -UIScreen.screenWidth / 2 + 35)
-            
             ZStack {
                 Color.clear
                     .contentShape(Rectangle())
@@ -36,11 +21,15 @@ struct ContentViewMapas: View {
                 VStack {
                     Text(tituloPiso)
                         .font(.system(size: 40, weight: .black))
+
+                    // Ajuste para centrar y definir el tamaño del mapa
                     interactiveMapView(svgName: svgName)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // Asegura que el mapa ocupe todo el espacio disponible
+                        .aspectRatio(contentMode: .fit) // Mantiene las proporciones del mapa
                 }
-                .padding(.horizontal, 15)
-                .padding(.vertical, 157)
+                .padding() // Aplica un espaciado uniforme, elimina padding específico
                 .opacity(opacity)
+
             }
             .fullScreenCover(item: $selectedZona) { zonaDetallada in
                 zonaDetallada // Presenta la vista ZonaDetallada
@@ -84,6 +73,7 @@ struct ContentViewMapas: View {
                         // Asigna la vista seleccionada a selectedZona
                         selectedZona = ZonaDetallada(TituloZona: String(clickedPath.name), idZona: idZona)
                     }
+                    print("\(self.clickedPath.name)")
                 }
                 .animation(.easeInOut(duration: 0.3), value: clickedPath)
         }
@@ -108,4 +98,3 @@ struct ContentViewMapas: View {
 #Preview {
     ContentViewMapas()
 }
-
