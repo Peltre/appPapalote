@@ -145,32 +145,10 @@ struct Perfil: View {
                                             .multilineTextAlignment(.center)
                                     }
                                     .padding()
-                                    .onTapGesture {
-                                        insigniaSeleccionada = insignia  // Asignar la insignia seleccionada
-                                        mostrarSheet.toggle()           // Mostrar la sheet
-                                    }                               
                                 }
                             }
                         }
                     }
-                }
-                .sheet(isPresented: $mostrarSheet) {
-                            if let insignia = insigniaSeleccionada {
-                                VStack {
-                                    Text(insignia.Nombre)
-                                        .font(.title)
-                                        .bold
-                                        .padding()
-                                    Text(insignia.Descripcion)
-                                        .font(.body)
-                                        .padding()
-                                    Button("Cerrar") {
-                                        mostrarSheet.toggle() // Cerrar la sheet
-                                    }
-                                    .padding()
-                                }
-                                .padding()
-                            }
                 }
                 .shadow(radius: 7)
                 .onAppear{
@@ -302,6 +280,7 @@ struct Perfil: View {
     Perfil()
         .environmentObject(PerfilViewModel())
 }
+
 
 func borrarArchivos() {
     // Lista de nombres de archivos a borrar
