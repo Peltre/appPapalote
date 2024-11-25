@@ -67,7 +67,7 @@ struct ContentViewMapas: View {
                         case "Path 28":
                             idZona = 6 // Pequeños
                         default:
-                            idZona = 0
+                            return
                         }
                         
                         // Asigna la vista seleccionada a selectedZona
