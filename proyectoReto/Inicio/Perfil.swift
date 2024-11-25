@@ -166,7 +166,7 @@ struct Perfil: View {
                     }
                 }
                 .padding()
-                .navigationDestination(isPresented: $navegarASignIn) {
+                .fullScreenCover(isPresented: $navegarASignIn) {
                     SignIn()
                 }
             }
