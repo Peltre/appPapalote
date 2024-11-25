@@ -147,8 +147,7 @@ struct Perfil: View {
                         .frame(width: 25, height: 25)
                     
                     Button {
-                        borrarUsuario()
-                        navegarASignIn = true
+                        self.cerrarSesion(usuario: usuarioGlobal!)
                     } label: {
                         Text("Cerrar Sesión")
                     }
@@ -262,22 +261,36 @@ struct Perfil: View {
         .environmentObject(PerfilViewModel())
 }
 
-func cerrarSesion() {
+func borrarArchivos() {
+    // Lista de nombres de archivos a borrar
+    let archivos = [
+        "sesion.json",
+        "insigniasCompletadas.json",
+        "actividadesCompletadas.json"
+    ]
     
-}
-
-// Función para borrar el usuario
-func borrarUsuario() {
-    let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("sesion.json")
+    // Obtener el directorio de documentos
+    guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        print("No se pudo acceder al directorio de documentos")
+        return
+    }
     
-    guard let url = fileURL else { return }
-    
-    do {
-        // Guardamos un JSON vacío
-        try "{}".write(to: url, atomically: true, encoding: .utf8)
-        print("El archivo de sesión ha sido limpiado.")
-    } catch {
-        print("Error al intentar limpiar el archivo de sesión: \(error.localizedDescription)")
+    // Iterar sobre cada archivo y borrarlo
+    for archivo in archivos {
+        let fileURL = documentDirectory.appendingPathComponent(archivo)
+        
+        do {
+            // Verificar si el archivo existe
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                // Intentar primero sobrescribir con JSON vacío
+                try "{}".write(to: fileURL, atomically: true, encoding: .utf8)
+                print("El archivo \(archivo) ha sido limpiado.")
+            } else {
+                print("El archivo \(archivo) no existe.")
+            }
+        } catch {
+            print("Error al intentar limpiar el archivo \(archivo): \(error.localizedDescription)")
+        }
     }
 }
 
@@ -305,7 +318,7 @@ func cargarUsuario() {
         
         // Update the properties with the loaded user data
         DispatchQueue.main.async {
-            self.fotoPerfil = usuario.pfp
+            self.fotoPerfil = usuario.pfp - 1
             self.nombreUsuario = usuario.username
         }
         
@@ -349,7 +362,7 @@ func cargarUsuario() {
             
             // Update the properties with the loaded user data
             DispatchQueue.main.async {
-                self.fotoPerfil = usuario.pfp
+                self.fotoPerfil = usuario.pfp - 1
             }
             
         } catch {
@@ -373,11 +386,11 @@ func cargarUsuario() {
             
             // Actualizar solo las propiedades necesarias
             usuarioActualizado.username = nombreUsuario
-            usuarioActualizado.pfp = fotoPerfil // Actualiza según corresponda
+            usuarioActualizado.pfp = fotoPerfil + 1// Actualiza según corresponda
         } catch {
             print("No se pudieron cargar los datos existentes o archivo no encontrado. Se creará un nuevo usuario.")
             // Si no hay datos existentes, crear un nuevo usuario con valores por defecto
-            usuarioActualizado = user(idUsuario: 1, username: nombreUsuario, correo: "hola@gmail.com", pfp: fotoPerfil) // Ajusta los valores predeterminados
+            usuarioActualizado = user(idUsuario: 1, username: nombreUsuario, correo: "hola@gmail.com", pfp: fotoPerfil+1) // Ajusta los valores predeterminados
         }
         
         // Guardar los datos actualizados
@@ -410,7 +423,7 @@ func cargarUsuario() {
         let datosActualizados: [String: Any] = [
             "id": usuario.idUsuario,
             "username": nombreUsuario,  // nuevo nombre de usuario
-            "pfp": fotoPerfil        // pfp sin cambios
+            "pfp": fotoPerfil + 1       // pfp sin cambios
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: datosActualizados) else {
@@ -492,7 +505,7 @@ extension Perfil {
         fetchInsigniasCompletadas(idUsuario: usuario.idUsuario)
         
         // Borrar usuario local y navegar a SignIn
-        borrarUsuario()
+        borrarArchivos()
         navegarASignIn = true
     }
     
