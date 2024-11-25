@@ -282,7 +282,7 @@
             
             // Update the properties with the loaded user data
             DispatchQueue.main.async {
-                self.fotoPerfil = usuario.pfp
+                self.fotoPerfil = usuario.pfp - 1
                 self.nombreUsuario = usuario.username
             }
             
@@ -327,7 +327,7 @@
                 
                 // Update the properties with the loaded user data
                 DispatchQueue.main.async {
-                    self.fotoPerfil = usuario.pfp
+                    self.fotoPerfil = usuario.pfp - 1
                 }
                 
             } catch {
@@ -351,7 +351,7 @@
                 
                 // Actualizar solo las propiedades necesarias
                 usuarioActualizado.username = nombreUsuario
-                usuarioActualizado.pfp = fotoPerfil // Actualiza según corresponda
+                usuarioActualizado.pfp = fotoPerfil + 1 // Actualiza según corresponda
             } catch {
                 print("No se pudieron cargar los datos existentes o archivo no encontrado. Se creará un nuevo usuario.")
                 // Si no hay datos existentes, crear un nuevo usuario con valores por defecto
