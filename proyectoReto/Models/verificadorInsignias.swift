@@ -73,6 +73,12 @@ class VerificadorInsignias {
 
         // If there are new insignias, update the local JSON
         if !newInsignias.isEmpty {
+            
+            // Insert each InsigniaID into the global set
+            for insignia in newInsignias {
+                insigniasCompletadasSet.insert(insignia.InsigniaId)
+            }
+            
             // Create the current date string
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"

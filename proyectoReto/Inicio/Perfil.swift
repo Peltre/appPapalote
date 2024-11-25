@@ -305,7 +305,7 @@ func cargarUsuario() {
         
         // Update the properties with the loaded user data
         DispatchQueue.main.async {
-            self.fotoPerfil = usuario.pfp - 1
+            self.fotoPerfil = usuario.pfp
             self.nombreUsuario = usuario.username
         }
         
@@ -349,7 +349,7 @@ func cargarUsuario() {
             
             // Update the properties with the loaded user data
             DispatchQueue.main.async {
-                self.fotoPerfil = usuario.pfp - 1
+                self.fotoPerfil = usuario.pfp
             }
             
         } catch {
@@ -410,7 +410,7 @@ func cargarUsuario() {
         let datosActualizados: [String: Any] = [
             "id": usuario.idUsuario,
             "username": nombreUsuario,  // nuevo nombre de usuario
-            "pfp": fotoPerfil + 1        // pfp sin cambios
+            "pfp": fotoPerfil        // pfp sin cambios
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: datosActualizados) else {
