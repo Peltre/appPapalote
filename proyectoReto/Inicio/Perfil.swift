@@ -147,6 +147,9 @@ struct Perfil: View {
                     }
                 }
                 .shadow(radius: 7)
+                .onAppear{
+                    print("Imprimiendo el set de Insignias Completadas \(insigniasCompletadasSet)")
+                }
 
                 
                 // Cerrar sesión
