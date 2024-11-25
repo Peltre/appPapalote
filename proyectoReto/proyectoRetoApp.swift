@@ -59,6 +59,10 @@ struct proyectoRetoApp: App {
             obtenerInsignias()
             loadInsigniasCompletadas(for: usuarioCargado.idUsuario)
             usuarioGlobal = usuarioCargado
+            // Iniciar la precarga de imágenes aquí, después de que todos los datos estén cargados
+            Task {
+                await precargarTodasLasImagenes()
+            }
             return usuarioCargado
         } catch {
             print("Error cargando usuario: \(error)")
@@ -298,12 +302,14 @@ func obtenerActividadesCompletadas2(idUsuario: Int, completion: @escaping ([Bool
 
     // Función auxiliar para generar array booleano
     func generarArrayBooleano(from actividades: [ActividadUsuario]) -> [Bool] {
+        print("Generando el array de booleanos con \(numActividades)")
         var actividadesBool = [Bool](repeating: false, count: numActividades + 1)
         for actividad in actividades {
             if actividad.id_actividad >= 0 && actividad.id_actividad < actividadesBool.count {
                 actividadesBool[actividad.id_actividad] = true
             }
         }
+        print(actividadesBool)
         return actividadesBool
     }
 
@@ -607,3 +613,55 @@ func actualizarUsuarioDB(usuario : user) {
     }.resume()
 }
 
+func obtenerTodasLasUrlsDeImagenes() -> [String] {
+    // Obtener las actividades del DataManager
+    let actividades = ActividadesDataManager.shared.actividades
+    
+    // Lista donde guardaremos todas las URLs
+    var urlDeTodasLasImagenes: [String] = []
+    
+    // Recorrer cada actividad y sus tarjetas
+    for actividad in actividades {
+        // Acceder a las tarjetas de la actividad
+        for tarjeta in actividad.listaTarjetas {
+            // Verificar que la URL de la imagen no sea nula
+            if let imagenUrl = tarjeta.imagenUrl, !imagenUrl.isEmpty {
+                urlDeTodasLasImagenes.append(imagenUrl)
+            }
+        }
+    }
+    
+    // Recorrer las insignias (asumiendo que es una variable global)
+    for insignia in insignias {
+        // Verificar que el ImagenLink no sea nulo o vacío
+        if insignia.ImagenLink.isEmpty {
+            urlDeTodasLasImagenes.append(insignia.ImagenLink)
+        }
+    }
+    
+    return urlDeTodasLasImagenes
+}
+
+// Función de precarga simplificada
+func precargarTodasLasImagenes() async {
+    // Obtener todas las URLs de imágenes
+    let urls = obtenerTodasLasUrlsDeImagenes()
+    
+    // Crear grupo de tareas para carga paralela
+    await withTaskGroup(of: Void.self) { group in
+        for urlString in urls {
+            group.addTask {
+                if let url = URL(string: urlString) {
+                    let _ = await CacheAsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty, .success, .failure, _:
+                            EmptyView()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    print("Precarga de imágenes completada")
+}

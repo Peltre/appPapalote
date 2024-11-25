@@ -63,7 +63,7 @@ struct TemplateActividad2: View {
                                 .font(.largeTitle)
                                 .foregroundColor(colores[unaActividad.idZona]!)
 
-                            if qrFlag && unaActividad.completar {
+                            if qrFlag && (unaActividad.completar != 0) {
                                 // Complete button
                                 Button(action: {
                                     ActividadUsuario.crearActividadUsuarioLocal(idUsuario: usuarioGlobal!.idUsuario, idActividad: unaActividad.idActividad) { success in
@@ -195,18 +195,41 @@ struct InsigniaItemView: View {
     
     var body: some View {
         VStack {
-            AsyncImage(url: URL(string: insignia.ImagenLink)) { image in
-                image
+            if let url = URL(string: insignia.ImagenLink) {
+                CacheAsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 100, height: 100)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .shadow(radius: 4)
+                    case .failure:
+                        Image(systemName: "medalla")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .foregroundColor(.gray)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            } else {
+                Image(systemName: "medalla")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 100)
-            } placeholder: {
-                ProgressView()
+                    .foregroundColor(.gray)
             }
+            
             Text(insignia.Nombre)
                 .font(.caption)
+                .multilineTextAlignment(.center)
         }
-        .padding(.horizontal, UIScreen.screenWidth/3.45)
+        .padding()
     }
 }
 
@@ -265,7 +288,7 @@ struct PopupInsigniasView: View {
 }
 
 #Preview {
-    TemplateActividad2(unaActividad: Actividad2(idActividad: 3, idZona: 2, nombre: "PEPE", listaTarjetas: Tarjeta.datosEjemplo, completar: true), qrFlag: true)
+    TemplateActividad2(unaActividad: Actividad2(idActividad: 3, idZona: 2, nombre: "PEPE", listaTarjetas: Tarjeta.datosEjemplo, completar: 1), qrFlag: true)
 }
 
 //#Preview {

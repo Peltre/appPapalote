@@ -30,8 +30,8 @@
             filePath = "proyectoReto/proyectoRetoApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "430"
-            endingLineNumber = "430"
+            startingLineNumber = "436"
+            endingLineNumber = "436"
             landmarkName = "fetchInsigniasCompletadas(idUsuario:)"
             landmarkType = "9">
          </BreakpointContent>

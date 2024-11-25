@@ -140,7 +140,7 @@ struct InicioOverhaul: View {
             }
             .background(
                 NavigationLink(
-                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo, completar: true), qrFlag: true)
+                    destination: TemplateActividad2(unaActividad: actividadEncontrada ?? Actividad2(idActividad: 0, idZona: 0, nombre: "Desconocida", listaTarjetas: Tarjeta.datosEjemplo, completar: 0), qrFlag: true)
                         .navigationBarHidden(true),
                     isActive: $navegarActividad
                 ) {
