@@ -373,11 +373,11 @@ func cargarUsuario() {
             
             // Actualizar solo las propiedades necesarias
             usuarioActualizado.username = nombreUsuario
-            usuarioActualizado.pfp = fotoPerfil + 1 // Actualiza según corresponda
+            usuarioActualizado.pfp = fotoPerfil // Actualiza según corresponda
         } catch {
             print("No se pudieron cargar los datos existentes o archivo no encontrado. Se creará un nuevo usuario.")
             // Si no hay datos existentes, crear un nuevo usuario con valores por defecto
-            usuarioActualizado = user(idUsuario: 1, username: nombreUsuario, correo: "hola@gmail.com", pfp: fotoPerfil + 1) // Ajusta los valores predeterminados
+            usuarioActualizado = user(idUsuario: 1, username: nombreUsuario, correo: "hola@gmail.com", pfp: fotoPerfil) // Ajusta los valores predeterminados
         }
         
         // Guardar los datos actualizados
