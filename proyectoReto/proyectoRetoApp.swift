@@ -478,6 +478,8 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
             print("URL no válida para sincronizar las insignias")
             return
         }
+        
+        print("Nuevas Insignias que se estan mandando a la base \(newInsignias)")
 
         var requestSincronizar = URLRequest(url: urlSincronizar)
         requestSincronizar.httpMethod = "POST"
@@ -553,6 +555,9 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
                     // Si hay nuevas insignias, sincronizar con el servidor
                     if !newInsignias.isEmpty {
                         syncWithServer(newInsignias: newInsignias)
+                    }
+                    else {
+                        print("No hay nuevas insignias que sincronizar local con base")
                     }
                     
                     // Usar los datos locales como fuente de verdad
