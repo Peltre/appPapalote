@@ -11,6 +11,8 @@ struct SignIn: View {
     @State private var alertMessage: String = ""
     @State private var isLoading: Bool = false // Nuevo estado para el progreso
     @State private var isAuthenticated: Bool = false // Nueva variable de autenticación
+    @State private var isButtonVisible = true // Controla la visibilidad del botón
+
     
     @Environment(\.colorScheme) private var colorScheme
     
@@ -34,24 +36,29 @@ struct SignIn: View {
                         .offset(x: -4)
                         .padding(.bottom, 30)
                     
-                    Button {
-                        withAnimation(.easeInOut) {
-                            isLoginViewShown = true
+                    if isButtonVisible {
+                        
+                        Button {
+                            withAnimation(.easeInOut) {
+                                isLoginViewShown = true
+                                isButtonVisible = false // Oculta el botón al hacer clic
+                                
+                            }
+                        } label: {
+                            Text("Comenzar")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
                         }
-                    } label: {
-                        Text("Comenzar")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.white)
+                        .frame(height: 50)
+                        .frame(width: 280)
+                        .background(
+                            LinearGradient(colors: [colores[3]!, .green], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .cornerRadius(30)
+                        .shadow(radius: 8, y: 10)
+                        .padding()
                     }
-                    .frame(height: 50)
-                    .frame(width: 280)
-                    .background(
-                        LinearGradient(colors: [colores[3]!, .green], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .cornerRadius(30)
-                    .shadow(radius: 8, y: 10)
-                    .padding()
                 }
                 
                 if isLoginViewShown {
@@ -139,6 +146,7 @@ struct SignIn: View {
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isLoginViewShown = false
+                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 isRegisterViewShown = true
@@ -146,13 +154,24 @@ struct SignIn: View {
                         }
                     }
                 } label: {
-                    Text("¿No tienes una cuenta?").padding(.top, 10)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white.opacity(0.8)) // Fondo semitransparente
+                            .frame(width: 200, height: 40) // Ajusta el tamaño según sea necesario
+                            .shadow(radius: 3) // Opcional: sombra para mejor visibilidad
+                        
+                        Text("¿No tienes una cuenta?")
+                            .font(.footnote)
+                            .foregroundColor(.black)
+                            .ignoresSafeArea(.keyboard)// Asegura que el texto sea visible
+                    }
                 }
             }
             
             closeButton {
                 withAnimation(.easeInOut) {
                     isLoginViewShown = false
+                    isButtonVisible = true
                 }
             }
         }
@@ -229,13 +248,25 @@ struct SignIn: View {
                         }
                     }
                 } label: {
-                    Text("¿Ya tienes una cuenta?").padding(.top, 10)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white.opacity(0.8)) // Fondo semitransparente
+                            .frame(width: 200, height: 40) // Ajusta el tamaño según sea necesario
+                            .shadow(radius: 3) // Opcional: sombra para mejor visibilidad
+                        
+                        Text("¿Ya tienes una cuenta?")
+                            .font(.footnote)
+                            .foregroundColor(.black)
+                            .ignoresSafeArea(.keyboard)// Asegura que el texto sea visible
+                    }
                 }
             }
             
             closeButton {
                 withAnimation(.easeInOut) {
                     isRegisterViewShown = false
+                    isButtonVisible = true
+
                 }
             }
         }
