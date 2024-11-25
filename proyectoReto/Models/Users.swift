@@ -21,3 +21,11 @@ struct user: Codable {
         case pfp = "pfp"
     }
 }
+
+struct RegistroUsuario: Encodable {
+    let username: String
+    let pfp: String
+    let correo: String
+    let pass: String
+}
+
