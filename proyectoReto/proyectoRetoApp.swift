@@ -13,7 +13,7 @@ struct proyectoRetoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var usuario: user?
     @State private var isLoadingActividadesCompletadas = false
-    @State private var isLoadingInsignias = false
+    @State private var isLoadingUsuario = false
     @State private var isLoadingInsigniasCompletadas = false
     @EnvironmentObject var perfilViewModel: PerfilViewModel
     
@@ -54,7 +54,7 @@ struct proyectoRetoApp: App {
             let decoder = JSONDecoder()
             let usuarioCargado = try decoder.decode(user.self, from: datosRecuperados)
             print("Usuario cargado exitosamente: \(usuarioCargado)")
-            actualizarUsuarioDB(usuario: usuarioCargado)
+            loadActualizarUsuario(for: usuarioCargado)
             loadActividadesCompletadas(for: usuarioCargado.idUsuario)
             obtenerInsignias()
             loadInsigniasCompletadas(for: usuarioCargado.idUsuario)
@@ -67,6 +67,16 @@ struct proyectoRetoApp: App {
         } catch {
             print("Error cargando usuario: \(error)")
             return nil
+        }
+    }
+    
+    // Función para cargar actividades completadas
+    private func loadActualizarUsuario(for usuario: user) {
+        guard !isLoadingUsuario else { return } // Evitar múltiples cargas
+        isLoadingUsuario = true
+        
+        actualizarUsuarioDB(usuario: usuario) { _ in
+            isLoadingUsuario = false // Cambiar el estado de carga a false después de obtener los datos
         }
     }
     
@@ -86,7 +96,9 @@ struct proyectoRetoApp: App {
         guard !isLoadingInsigniasCompletadas else { return } // Evitar múltiples cargas
         isLoadingInsigniasCompletadas = true
         
-        fetchInsigniasCompletadas(idUsuario: idUsuario)
+        fetchInsigniasCompletadas(idUsuario: idUsuario) {_ in 
+            isLoadingInsigniasCompletadas = false
+        }
     }
 }
 
@@ -433,11 +445,12 @@ func obtenerInsignias() {
     }.resume()
 }
 
-func fetchInsigniasCompletadas(idUsuario: Int) {
+func fetchInsigniasCompletadas(idUsuario: Int, completion: @escaping (Bool) -> Void) {
     // Obtener la URL del archivo local
     let fileManager = FileManager.default
     guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
         print("No se pudo obtener el directorio de documentos")
+        completion(false)
         return
     }
     let localFileURL = documentsDirectory.appendingPathComponent("insigniasCompletadas.json")
@@ -473,9 +486,10 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
     }
     
     // Función auxiliar para sincronizar con el servidor
-    func syncWithServer(newInsignias: [UserInsignia]) {
+    func syncWithServer(newInsignias: [UserInsignia], syncCompletion: @escaping (Bool) -> Void) {
         guard let urlSincronizar = URL(string: apiURLbase + "sincronizar_insignias_completadas") else {
             print("URL no válida para sincronizar las insignias")
+            syncCompletion(false)
             return
         }
         
@@ -487,16 +501,19 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
 
         guard let syncData = try? JSONEncoder().encode(newInsignias) else {
             print("Error al codificar las nuevas insignias para sincronizar")
+            syncCompletion(false)
             return
         }
 
         requestSincronizar.httpBody = syncData
 
-        URLSession.shared.dataTask(with: requestSincronizar) { _, _, error in
+        URLSession.shared.dataTask(with: requestSincronizar) { _, response, error in
             if let error = error {
                 print("Error al sincronizar las insignias: \(error)")
+                syncCompletion(false)
             } else {
                 print("Sincronización de insignias completadas exitosa")
+                syncCompletion(true)
             }
         }.resume()
     }
@@ -506,6 +523,7 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
         print("URL no válida para obtener las insignias completadas")
         let localInsignias = readLocalData()
         updateGlobalVariables(with: localInsignias)
+        completion(false)
         return
     }
 
@@ -517,6 +535,7 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
         print("Error al codificar los parámetros para el request")
         let localInsignias = readLocalData()
         updateGlobalVariables(with: localInsignias)
+        completion(false)
         return
     }
     
@@ -531,6 +550,7 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
         if error != nil || data == nil {
             print("Error en el request de insignias completadas o no hay datos")
             updateGlobalVariables(with: localInsignias)
+            completion(false)
             return
         }
         
@@ -541,10 +561,13 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
                 
                 if localInsignias.isEmpty {
                     // Si el archivo local está vacío, guardar datos del API
+                    print("Archivo local de insignias completadas esta vacio")
                     saveDataLocally(insigniasAPI)
                     updateGlobalVariables(with: insigniasAPI)
+                    completion(true)
                 } else {
                     // Encontrar insignias nuevas que están en local pero no en API
+                    print("Archivo local de insignias completadas no esta vacio")
                     let newInsignias = localInsignias.filter { localInsignia in
                         !insigniasAPI.contains { apiInsignia in
                             apiInsignia.InsigniaID == localInsignia.InsigniaID &&
@@ -554,26 +577,29 @@ func fetchInsigniasCompletadas(idUsuario: Int) {
                     
                     // Si hay nuevas insignias, sincronizar con el servidor
                     if !newInsignias.isEmpty {
-                        syncWithServer(newInsignias: newInsignias)
-                    }
-                    else {
+                        syncWithServer(newInsignias: newInsignias) { success in
+                            updateGlobalVariables(with: localInsignias)
+                            completion(success)
+                        }
+                    } else {
                         print("No hay nuevas insignias que sincronizar local con base")
+                        updateGlobalVariables(with: localInsignias)
+                        completion(true)
                     }
-                    
-                    // Usar los datos locales como fuente de verdad
-                    updateGlobalVariables(with: localInsignias)
                 }
             } catch {
                 print("Error al decodificar respuesta del API: \(error)")
                 updateGlobalVariables(with: localInsignias)
+                completion(false)
             }
         }
     }.resume()
 }
 
-func actualizarUsuarioDB(usuario : user) {
+func actualizarUsuarioDB(usuario: user, completion: @escaping (Bool) -> Void) {
     guard let url = URL(string: apiURLbase + "modificar_usuario") else {
         print("URL Inválida")
+        completion(false)
         return
     }
     
@@ -586,6 +612,7 @@ func actualizarUsuarioDB(usuario : user) {
     
     guard let jsonData = try? JSONSerialization.data(withJSONObject: datosActualizados) else {
         print("Error al serializar los datos")
+        completion(false)
         return
     }
     
@@ -599,21 +626,25 @@ func actualizarUsuarioDB(usuario : user) {
     URLSession.shared.dataTask(with: request) { data, response, error in
         if let error = error {
             print("Error en la solicitud: \(error.localizedDescription)")
+            completion(false)
             return
         }
         
         guard let httpResponse = response as? HTTPURLResponse else {
             print("Respuesta del servidor no válida")
+            completion(false)
             return
         }
         
         if httpResponse.statusCode == 200 {
             print("Datos actualizados correctamente")
+            completion(true)
         } else {
             print("Error del servidor: \(httpResponse.statusCode)")
             if let data = data {
                 print("Respuesta del servidor:", String(data: data, encoding: .utf8) ?? "No se pudo leer la respuesta")
             }
+            completion(false)
         }
     }.resume()
 }

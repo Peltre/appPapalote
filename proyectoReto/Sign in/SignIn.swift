@@ -285,14 +285,40 @@ struct SignIn: View {
             if let usuario = try? JSONDecoder().decode(user.self, from: data) {
                 guardarUsuario(usuario: usuario)
                 usuarioGlobal = usuario
-//                verificarActividadesCompletadas()
-                actualizarUsuarioDB(usuario: usuario)
+                
+                // Grupo para manejar las operaciones asíncronas
+                let group = DispatchGroup()
+                
+                // Actualizar usuario en DB
+                group.enter()
+                actualizarUsuarioDB(usuario: usuario) { success in
+                    if !success {
+                        print("Error al actualizar usuario en DB")
+                    }
+                    group.leave()
+                }
+                
+                // Obtener actividades completadas
+                group.enter()
                 obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
                     actividadesCompletadas = completadas
+                    group.leave()
                 }
+                
+                // Obtener insignias
                 obtenerInsignias()
-                fetchInsigniasCompletadas(idUsuario: usuario.idUsuario)
-                DispatchQueue.main.async {
+                
+                // Fetch insignias completadas
+                group.enter()
+                fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { success in
+                    if !success {
+                        print("Error al obtener insignias completadas")
+                    }
+                    group.leave()
+                }
+                
+                // Cuando todas las operaciones asíncronas terminen
+                group.notify(queue: .main) {
                     self.isAuthenticated = true
                 }
             } else {

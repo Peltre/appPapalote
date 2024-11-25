@@ -488,26 +488,45 @@ class NetworkMonitor: ObservableObject {
 // Extensión de Perfil con la nueva implementación
 extension Perfil {
     func cerrarSesion(usuario: user) {
-        let networkMonitor = NetworkMonitor()
-        
-        // Verificar conexión a internet
-        guard networkMonitor.isConnected else {
-            // Mostrar alerta de no hay conexión
-            mostrarAlertaNoConexion()
-            return
+            let networkMonitor = NetworkMonitor()
+            
+            // Verificar conexión a internet
+            guard networkMonitor.isConnected else {
+                // Mostrar alerta de no hay conexión
+                mostrarAlertaNoConexion()
+                return
+            }
+            
+            // Grupo de dispatch para manejar múltiples operaciones asíncronas
+            let group = DispatchGroup()
+            
+            // Primera operación
+            group.enter()
+            actualizarUsuarioDB(usuario: usuario) { resultado in
+                // Asumiendo que actualizarUsuarioDB tiene un completion handler
+                group.leave()
+            }
+            
+            // Segunda operación
+            group.enter()
+            fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { resultado in
+                // Asumiendo que fetchInsigniasCompletadas tiene un completion handler
+                group.leave()
+            }
+            
+            // Tercera operación
+            group.enter()
+            obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
+                actividadesCompletadas = completadas
+                group.leave()
+            }
+            
+            // Cuando todas las operaciones terminen, ejecutar borrarArchivos
+            group.notify(queue: .main) {
+                borrarArchivos()
+                navegarASignIn = true
+            }
         }
-        
-        // Si hay conexión, ejecutar las funciones requeridas
-        actualizarUsuarioDB(usuario: usuario)
-        obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
-            actividadesCompletadas = completadas
-        }
-        fetchInsigniasCompletadas(idUsuario: usuario.idUsuario)
-        
-        // Borrar usuario local y navegar a SignIn
-        borrarArchivos()
-        navegarASignIn = true
-    }
     
     // Función auxiliar para mostrar alerta de no conexión
     private func mostrarAlertaNoConexion() {

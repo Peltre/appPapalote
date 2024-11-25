@@ -51,7 +51,7 @@ class VerificadorInsignias {
             do {
                 let data = try Data(contentsOf: localFileInsignias)
                 localInsigniasCompletadas = try JSONDecoder().decode([UserInsignia].self, from: data)
-                print("lista obtenida de actividadesCompletadas.json: \(localInsigniasCompletadas)")
+                print("lista obtenida de insigniasCompletadas.json: \(localInsigniasCompletadas)")
             } catch {
                 print("Error al leer o decodificar el archivo insigniasCompletadas.json: \(error)")
                 return nil
