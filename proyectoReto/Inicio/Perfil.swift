@@ -11,6 +11,7 @@ struct Perfil: View {
     @State private var editingName: Bool = false // Para la edición del nombre
     @State private var alertMessage: String = ""
     @State private var showAlert: Bool = false // Estado para mostrar alerta
+    @State var insigniasSetLocal : Set<Int> = Set<Int>()
     
     private let fotos = ["pfp_1", "pfp_2", "pfp_3", "pfp_4", "pfp_5"]
     
@@ -487,64 +488,77 @@ func cargarUsuario() {
     }
 }
 
-// Monitor de red
-class NetworkMonitor: ObservableObject {
-    private let monitor = NWPathMonitor()
-    @Published var isConnected = true
-    
-    init() {
-        monitor.pathUpdateHandler = { [weak self] path in
-            DispatchQueue.main.async {
-                self?.isConnected = path.status == .satisfied
-            }
-        }
-        let queue = DispatchQueue(label: "NetworkMonitor")
-        monitor.start(queue: queue)
-    }
-}
-
-// Extensión de Perfil con la nueva implementación
 extension Perfil {
     func cerrarSesion(usuario: user) {
-            let networkMonitor = NetworkMonitor()
-            
-            // Verificar conexión a internet
-            guard networkMonitor.isConnected else {
-                // Mostrar alerta de no hay conexión
-                mostrarAlertaNoConexion()
+        // Primero verificamos la conexión con el endpoint
+        let url = URL(string: apiURLbase + "testConnection")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Verificar si hay error o no hay datos
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+                    self.mostrarAlertaNoConexion()
+                }
                 return
             }
             
-            // Grupo de dispatch para manejar múltiples operaciones asíncronas
-            let group = DispatchGroup()
-            
-            // Primera operación
-            group.enter()
-            actualizarUsuarioDB(usuario: usuario) { resultado in
-                // Asumiendo que actualizarUsuarioDB tiene un completion handler
-                group.leave()
+            // Intentar decodificar la respuesta
+            do {
+                struct ServerResponse: Codable {
+                    let mensaje: String
+                }
+                
+                let response = try JSONDecoder().decode(ServerResponse.self, from: data)
+                
+                // Verificar si el mensaje es el esperado
+                guard response.mensaje == "Servidor esta vivo" else {
+                    DispatchQueue.main.async {
+                        self.mostrarAlertaNoConexion()
+                    }
+                    return
+                }
+                
+                // Si llegamos aquí, la conexión está bien y podemos proceder
+                DispatchQueue.main.async {
+                    // Grupo de dispatch para manejar múltiples operaciones asíncronas
+                    let group = DispatchGroup()
+                    
+                    // Primera operación
+                    group.enter()
+                    actualizarUsuarioDB(usuario: usuario) { resultado in
+                        // Asumiendo que actualizarUsuarioDB tiene un completion handler
+                        group.leave()
+                    }
+                    
+                    // Segunda operación
+                    group.enter()
+                    fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { resultado in
+                        // Asumiendo que fetchInsigniasCompletadas tiene un completion handler
+                        group.leave()
+                    }
+                    
+                    // Tercera operación
+                    group.enter()
+                    obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
+                        actividadesCompletadas = completadas
+                        group.leave()
+                    }
+                    
+                    // Cuando todas las operaciones terminen, ejecutar borrarArchivos
+                    group.notify(queue: .main) {
+                        borrarArchivos()
+                        navegarASignIn = true
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.mostrarAlertaNoConexion()
+                }
             }
-            
-            // Segunda operación
-            group.enter()
-            fetchInsigniasCompletadas(idUsuario: usuario.idUsuario) { resultado in
-                // Asumiendo que fetchInsigniasCompletadas tiene un completion handler
-                group.leave()
-            }
-            
-            // Tercera operación
-            group.enter()
-            obtenerActividadesCompletadas2(idUsuario: usuario.idUsuario) { completadas in
-                actividadesCompletadas = completadas
-                group.leave()
-            }
-            
-            // Cuando todas las operaciones terminen, ejecutar borrarArchivos
-            group.notify(queue: .main) {
-                borrarArchivos()
-                navegarASignIn = true
-            }
-        }
+        }.resume()
+    }
     
     // Función auxiliar para mostrar alerta de no conexión
     private func mostrarAlertaNoConexion() {
