@@ -84,11 +84,18 @@ struct TemplateActividad2: View {
                                     }
                                 }) {
                                     Text(actividadesCompletadas[unaActividad.idActividad] ? "Completada" : "Completar")
-                                        .foregroundColor(actividadesCompletadas[unaActividad.idActividad] ? .red : .green)
+                                        .foregroundColor(actividadesCompletadas[unaActividad.idActividad] ? .black : .white)
+                                        .bold()
                                         .padding(5)
-                                        .background(Color.white)
-                                        .cornerRadius(5)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 7)
+                                        .background(actividadesCompletadas[unaActividad.idActividad] ? .red : .green)
+                                        .cornerRadius(20)
+                                        .shadow(radius: 5, y: 2)
+                                        .animation(.easeInOut(duration: 0.3), value: actividadesCompletadas[unaActividad.idActividad]) // Apply animation here
                                 }
+                                .padding(.bottom,20)
+                                .scaleEffect(1.3)
                                 .disabled(isActivityCompleted)
                             }
 
@@ -116,95 +123,69 @@ struct TemplateActividad2: View {
     }
 
     func tarjetaView(tarjeta: Tarjeta, actividad: Actividad2) -> some View {
-        let cardWidth: CGFloat = UIScreen.screenWidth - 50
+            let cardWidth: CGFloat = UIScreen.screenWidth - 50
 
-        let question: Question?
-        if let texto = tarjeta.texto, let data = texto.data(using: .utf8) {
-            let decoder = JSONDecoder()
-            question = try? decoder.decode(Question.self, from: data)
-        } else {
-            question = nil
-        }
-
-        switch tarjeta.tipo {
-        case 1:
-            return AnyView(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.white.opacity(0.7))
-                        .frame(minWidth: cardWidth, minHeight: 180) // Altura mínima asegurada
-                        .shadow(color: Color(white: 0.96), radius: 2)
-                    
-                    VStack(spacing: 20) {
-                        Spacer()
-                        Text(question?.titulo ?? "")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.black)
-                        
-                        Text(question?.texto ?? "")
-                            .font(.body)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .fixedSize(horizontal: false, vertical: true) // Esto asegura que se muestre todo el texto
-                        Spacer()
-                    }
-                    .padding()
-                }
-                    .frame(width: cardWidth)
-            )
-        case 2, 3:
-            if let question = question {
-                return AnyView(
-                    SlidingOverlayCardView(question: question, imageUrl: tarjeta.imagenUrl)
-                        .frame(width: cardWidth, height: cardWidth)
-                )
+            let question: Question?
+            if let texto = tarjeta.texto, let data = texto.data(using: .utf8) {
+                let decoder = JSONDecoder()
+                question = try? decoder.decode(Question.self, from: data)
             } else {
-                return AnyView(
-                    Text("Invalid JSON format for question")
-                        .foregroundColor(.red)
-                )
+                question = nil
             }
-        case 4:
-            return AnyView(
-                ZStack {
-                    Circle()
-                        .fill(colores[actividad.idZona]!)
-                        .frame(width: cardWidth, height: cardWidth)
 
-                    if let imagenUrl = tarjeta.imagenUrl, let url = URL(string: imagenUrl) {
-                        CacheAsyncImage(url: url) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .frame(width: cardWidth, height: cardWidth)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .clipShape(Circle())
-                                    .frame(width: cardWidth - 20, height: cardWidth - 20)
-                            case .failure(let error):
-                                Text("Error loading image: \(error)")
-                                    .frame(width: cardWidth, height: cardWidth)
-                            @unknown default:
-                                fatalError()
-                            }
+            switch tarjeta.tipo {
+            case 1:
+                return AnyView(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(.thinMaterial)
+                            .shadow(color: Color(white: 0.96), radius: 2)
+                        
+                        VStack(spacing: 20) {
+                            Spacer()
+                            Text(question?.titulo ?? "")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
+                            
+                            Text(question?.texto ?? "")
+                                .font(.body)
+                                .foregroundColor(.black)
+                                .padding(.horizontal)
+                                .fixedSize(horizontal: false, vertical: true) // Asegura que el texto se expanda
+                            Spacer()
                         }
+                        .padding()
                     }
+                    .frame(width: cardWidth)
+                    .frame(minHeight: 180) // Altura mínima
+                    .background(GeometryReader { geometry in
+                        Color.clear.onAppear {
+                            print("Height: \(geometry.size.height)") // Para debugging, si lo necesitas
+                        }
+                    })
+                )
+            case 2, 3:
+                if let question = question {
+                    return AnyView(
+                        SlidingOverlayCardView(question: question, imageUrl: tarjeta.imagenUrl)
+                            .frame(width: cardWidth, height: cardWidth)
+                    )
+                } else {
+                    return AnyView(
+                        Text("Invalid JSON format for question")
+                            .foregroundColor(.red)
+                    )
                 }
-                .frame(width: cardWidth, height: cardWidth)
-                .padding(.vertical, 20)
-            )
-        case 5:
-            return AnyView(
-                QuizCardView(question: question, cardWidth: cardWidth)
-            )
-        default:
-            return AnyView(EmptyView())
+            case 5:
+                return AnyView(
+                    QuizCardView(question: question, cardWidth: cardWidth)
+                )
+            default:
+                return AnyView(EmptyView())
+            }
         }
     }
-}
 
 // Create a separate view for individual insignia
 struct InsigniaItemView: View {
@@ -246,7 +227,7 @@ struct InsigniaItemView: View {
                 .font(.caption)
                 .multilineTextAlignment(.center)
         }
-        .padding()
+        .padding(.horizontal, UIScreen.screenWidth/3.85)
     }
 }
 

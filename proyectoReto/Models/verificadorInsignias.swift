@@ -13,11 +13,40 @@ class VerificadorInsignias {
         // Example of adding verifications with conditions based on completed activities
         verificaciones[1] = { verificador in
             // Condition for Insignia 1: Completed activities count should be >= 5
-            return verificador.actividadesCompletadasInterna.count >= 5
+            return verificador.actividadesCompletadasInterna.count >= 1
         }
         verificaciones[2] = { verificador in
             // Condition for Insignia 2: Completed activities count should be >= 10
+            return verificador.actividadesCompletadasInterna.count >= 5
+        }
+        verificaciones[3] = { verificador in
+            // Condition for Insignia 2: Completed activities count should be >= 10
             return verificador.actividadesCompletadasInterna.count >= 10
+        }
+        verificaciones[4] = { verificador in
+            // Obtener las actividades filtradas por la zona 2
+            let actividadesZona2 = ActividadesDataManager.shared.obtenerActividadesPorZona(2)
+            
+            // Filtrar las actividades para quedarnos solo con las actividades cuyo 'completar' sea 1
+            let actividadesFiltradasZona2 = actividadesZona2.filter { $0.completar == 1 }
+            
+            // Obtener la lista de 'actividad_usuario' del verificador
+            let actividadesUsuario = verificador.actividadesCompletadasInterna
+            
+            // Filtrar las actividades del usuario, quedándonos solo con las que tienen 'id_actividad'
+            let actividadesUsuarioIds = actividadesUsuario.map { $0.id_actividad }
+            
+            // Ahora, mapeamos y filtramos las actividades para obtener los ID de las actividades que coincidan
+            let actividadesCoincidentes = actividadesFiltradasZona2.filter { actividad in
+                actividadesUsuarioIds.contains(actividad.idActividad)
+            }
+            
+            // Comparar la cantidad de actividades coincidentes con el valor esperado
+            let cantidadCoincidentes = actividadesCoincidentes.count
+            let cantidadEsperada = TotalActividadesPorCompletarPorZona[1] // Asumiendo que 'TotalActividadesPorCompletarPorZona' es un array
+            
+            // Si la cantidad de actividades coincidentes es igual a la cantidad esperada, retornamos true
+            return cantidadCoincidentes == cantidadEsperada
         }
     }
     
