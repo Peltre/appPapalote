@@ -275,10 +275,11 @@ struct SignIn: View {
         }
     }
     
-    let fixedSalt = "fixed_salt"
-    
-    func hashPassword(password: String) -> String {
-        let combined = password + fixedSalt // Usa el fixedSalt en lugar de un salt generado aleatoriamente
+    func hashPassword(password: String, email: String) -> String {
+        // Obtener las primeras 4 letras del correo como salt
+        let salt = String(correo.prefix(4))
+        let combined = password + salt
+
         guard let data = combined.data(using: .utf8) else { return "" }
         let hashed = SHA256.hash(data: data)
         return hashed.compactMap { String(format: "%02x", $0) }.joined()
@@ -287,7 +288,7 @@ struct SignIn: View {
     
     private func registrarUsuario() {
         isLoading = true // Comenzar la carga
-        hashedPassword = hashPassword(password: password) // Asegúrate de que 'password' es la contraseña proporcionada
+        hashedPassword = hashPassword(password: password, email:correo ) // Asegúrate de que 'password' es la contraseña proporcionada
 
         guard let url = URL(string: "\(apiURLbase)crear_usuario") else { return }
 
@@ -393,7 +394,7 @@ struct SignIn: View {
         
         guard let url = URL(string: "\(apiURLbase)login") else { return }
         
-        hashedPassword = hashPassword(password: password) // Asegúrate de que 'password' es
+        hashedPassword = hashPassword(password: password, email: correo) // Asegúrate de que 'password' es
         
         let loginData: [String: String] = ["correo": correo, "password": hashedPassword]
         guard let jsonData = try? JSONEncoder().encode(loginData) else { return }
